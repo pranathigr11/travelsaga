@@ -1,0 +1,272 @@
+[
+  {
+    "id": 0,
+    "name": "The Dravidian Voyager",
+    "slug": "the-dravidian-voyager",
+    "duration": 9,
+    "maxGroupSize": 16,
+    "difficulty": "medium",
+    "ratingsAverage": 4.8,
+    "ratingsQuantity": 28,
+    "price": 997,
+    "summary": "Journey through the heart of Tamil Nadu, exploring ancient, towering temples and vibrant French-colonial towns.",
+    "description": "A 9-day tour through the heart of Tamil Nadu, exploring ancient, towering temples with intricate carvings, a vibrant French-colonial town, and sun-drenched coastal shores.\nDay 1: Arrive in Chennai, travel to Mahabalipuram, visit Shore Temple\nDay 2: Explore Five Rathas & Arjuna's Penance\nDay 3: Travel to Puducherry and explore the French Quarter\nDay 4: Visit Auroville and relax on Paradise Beach\nDay 5: Travel to Thanjavur, visit Brihadeeswarar Temple\nDay 6: Explore Thanjavur Maratha Palace and Art Gallery\nDay 7: Travel to Madurai, witness the evening temple ceremony\nDay 8: Full tour of the grand Meenakshi Amman Temple complex\nDay 9: Explore old Madurai, depart.",
+    "imageCover": "tour-1-cover.jpg",
+    "images": ["tour-1-1.jpg", "tour-1-2.jpg", "tour-1-3.jpg"],
+    "startDates": ["2025-01-15T09:00:00.000Z", "2025-03-20T09:00:00.000Z"],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [80.2707, 13.0827],
+      "description": "Chennai, Tamil Nadu",
+      "address": "Chennai International Airport"
+    },
+    "locations": [
+      { "type": "Point", "coordinates": [80.1933, 12.6047], "description": "Mahabalipuram", "day": 1 },
+      { "type": "Point", "coordinates": [79.8083, 11.9416], "description": "Puducherry", "day": 3 },
+      { "type": "Point", "coordinates": [79.1378, 10.7870], "description": "Thanjavur", "day": 5 },
+      { "type": "Point", "coordinates": [78.1198, 9.9252], "description": "Madurai", "day": 7 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Aarav Sharma", "photo": "user-1.jpg" },
+      { "role": "guide", "name": "Priya Singh", "photo": "user-2.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 1,
+    "name": "The Emerald Drifter",
+    "slug": "the-emerald-drifter",
+    "duration": 7,
+    "maxGroupSize": 12,
+    "difficulty": "easy",
+    "ratingsAverage": 4.9,
+    "ratingsQuantity": 35,
+    "price": 799,
+    "summary": "Glide through serene backwaters, wander through spice plantations, and unwind on palm-fringed clifftop beaches.",
+    "description": "A 7-day tour to glide through serene backwaters on a traditional houseboat, wander through fragrant spice plantations, and unwind on palm-fringed clifftop beaches in 'God's Own Country'.\nDay 1: Arrive in Kochi, explore historic Fort Kochi\nDay 2: Visit Mattancherry Palace and Chinese Fishing Nets\nDay 3: Scenic drive to Munnar, visit a tea plantation\nDay 4: Trek in Eravikulam National Park\nDay 5: Travel to Alleppey, board an overnight houseboat\nDay 6: Disembark, travel to Varkala for sunset\nDay 7: Relax on Varkala beach and depart.",
+    "imageCover": "tour-2-cover.jpg",
+    "images": ["tour-2-1.jpg", "tour-2-2.jpg", "tour-2-3.jpg"],
+    "startDates": ["2024-12-05T09:00:00.000Z", "2025-02-10T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [76.2673, 9.9312], "description": "Kochi, Kerala", "address": "Cochin International Airport" },
+    "locations": [
+      { "type": "Point", "coordinates": [77.0595, 10.0889], "description": "Munnar", "day": 3 },
+      { "type": "Point", "coordinates": [76.3388, 9.5245], "description": "Alleppey Backwaters", "day": 5 },
+      { "type": "Point", "coordinates": [76.7161, 8.7373], "description": "Varkala", "day": 6 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Ananya Nair", "photo": "user-3.jpg" },
+      { "role": "guide", "name": "Rohan Menon", "photo": "user-4.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 2,
+    "name": "The Coastal Karma Quest",
+    "slug": "the-coastal-karma-quest",
+    "duration": 6,
+    "maxGroupSize": 18,
+    "difficulty": "easy",
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 22,
+    "price": 550,
+    "summary": "Discover Karnataka's hidden coastal gems, from sacred temple towns to laid-back bohemian beaches.",
+    "description": "A 6-day quest to discover Karnataka's hidden coastal gems, from sacred temple towns with divine feasts to laid-back beaches famed for their bohemian vibe and breathtaking sunsets.\nDay 1: Arrive Mangalore, travel to Udupi, visit Sri Krishna Temple\nDay 2: Travel to Murudeshwar, marvel at cliffside Shiva statue\nDay 3: Journey to Gokarna, relax on Kudle Beach\nDay 4: Hike from Om Beach to Half Moon Beach\nDay 5: Enjoy a coracle boat ride and explore the town\nDay 6: Final beach sunrise before departure.",
+    "imageCover": "tour-3-cover.jpg",
+    "images": ["tour-3-1.jpg", "tour-3-2.jpg", "tour-3-3.jpg"],
+    "startDates": ["2024-11-10T09:00:00.000Z", "2025-01-25T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [74.8560, 12.9141], "description": "Mangalore, Karnataka", "address": "Mangalore International Airport" },
+    "locations": [
+      { "type": "Point", "coordinates": [74.7421, 13.3323], "description": "Udupi", "day": 1 },
+      { "type": "Point", "coordinates": [74.4735, 14.0934], "description": "Murudeshwar", "day": 2 },
+      { "type": "Point", "coordinates": [74.3188, 14.5479], "description": "Gokarna", "day": 3 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Siddharth Rao", "photo": "user-5.jpg" },
+      { "role": "guide", "name": "Meera Hegde", "photo": "user-6.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 3,
+    "name": "The Coral Reef Explorer",
+    "slug": "the-coral-reef-explorer",
+    "duration": 8,
+    "maxGroupSize": 10,
+    "difficulty": "difficult",
+    "ratingsAverage": 4.9,
+    "ratingsQuantity": 15,
+    "price": 1450,
+    "summary": "Escape to a tropical paradise, diving in turquoise waters and relaxing on Asia's most beautiful beaches.",
+    "description": "An 8-day escape to a tropical paradise. Snorkel and scuba dive in crystal-clear turquoise waters, witness magical bioluminescence, and relax on some of Asia's most beautiful beaches.\nDay 1: Arrive in Port Blair, visit Cellular Jail\nDay 2: Explore Corbyn's Cove Beach and Chidiya Tapu\nDay 3: Ferry to Havelock Island, relax on Radhanagar Beach\nDay 4: Scuba diving adventure at Elephant Beach\nDay 5: Kayaking through mangroves\nDay 6: Ferry to Neil Island, visit Natural Bridge\nDay 7: Relax at Bharatpur and Laxmanpur beaches\nDay 8: Ferry back to Port Blair for departure.",
+    "imageCover": "tour-4-cover.jpg",
+    "images": ["tour-4-1.jpg", "tour-4-2.jpg", "tour-4-3.jpg"],
+    "startDates": ["2025-02-12T09:00:00.000Z", "2025-03-15T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [92.7156, 11.6234], "description": "Port Blair, Andaman & Nicobar", "address": "Veer Savarkar International Airport" },
+    "locations": [
+      { "type": "Point", "coordinates": [92.9856, 12.0163], "description": "Havelock Island (Swaraj Dweep)", "day": 3 },
+      { "type": "Point", "coordinates": [93.0236, 11.8329], "description": "Neil Island (Shaheed Dweep)", "day": 6 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Ishaan Ali", "photo": "user-7.jpg" },
+      { "role": "guide", "name": "Zara Begum", "photo": "user-8.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 4,
+    "name": "The Ruin Explorer",
+    "slug": "the-ruin-explorer",
+    "duration": 4,
+    "maxGroupSize": 14,
+    "difficulty": "medium",
+    "ratingsAverage": 4.6,
+    "ratingsQuantity": 19,
+    "price": 450,
+    "summary": "Wander through the boulder-strewn landscape and mythical ruins of the Vijayanagara Kingdom in Hampi.",
+    "description": "A 4-day tour to wander through the boulder-strewn landscape of a fallen empire. Explore ancient temples, royal enclosures, and the mythical ruins of the Vijayanagara Kingdom in Hampi.\nDay 1: Overnight train from Bengaluru to Hospet\nDay 2: Arrive, explore the Sacred Centre and Virupaksha Temple\nDay 3: Discover the Royal Centre and the iconic Stone Chariot\nDay 4: Sunrise trek up Matanga Hill before traveling back.",
+    "imageCover": "tour-5-cover.jpg",
+    "images": ["tour-5-1.jpg", "tour-5-2.jpg", "tour-5-3.jpg"],
+    "startDates": ["2024-10-22T09:00:00.000Z", "2024-11-25T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [77.5946, 12.9716], "description": "Bengaluru, Karnataka", "address": "Bengaluru City Junction Railway Station" },
+    "locations": [
+      { "type": "Point", "coordinates": [76.4715, 15.3350], "description": "Hampi", "day": 2 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Vikram Reddy", "photo": "user-9.jpg" },
+      { "role": "guide", "name": "Kavya Murthy", "photo": "user-10.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 5,
+    "name": "The Southern Tip Pilgrim",
+    "slug": "the-southern-tip-pilgrim",
+    "duration": 5,
+    "maxGroupSize": 20,
+    "difficulty": "easy",
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 42,
+    "price": 490,
+    "summary": "A spiritual journey to the very end of India, witnessing the confluence of three oceans and majestic temples.",
+    "description": "A 5-day spiritual and scenic journey to the very end of India. Witness the confluence of three oceans, majestic temples, and a spectacular sunrise that is second to none.\nDay 1: Arrive in Trivandrum, transfer to Kovalam beach\nDay 2: Free day for swimming or ayurvedic massage\nDay 3: Travel to Kanyakumari, watch the sunset\nDay 4: Witness the sunrise, take a ferry to Vivekananda Rock\nDay 5: Travel back to Trivandrum, visit Padmanabhaswamy Temple, then depart.",
+    "imageCover": "tour-6-cover.jpg",
+    "images": ["tour-6-1.jpg", "tour-6-2.jpg", "tour-6-3.jpg"],
+    "startDates": ["2024-12-15T09:00:00.000Z", "2025-01-20T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [76.9366, 8.5241], "description": "Trivandrum, Kerala", "address": "Trivandrum International Airport" },
+    "locations": [
+      { "type": "Point", "coordinates": [76.9781, 8.3881], "description": "Kovalam", "day": 1 },
+      { "type": "Point", "coordinates": [77.5350, 8.0883], "description": "Kanyakumari", "day": 3 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Lakshmi Pillai", "photo": "user-11.jpg" },
+      { "role": "guide", "name": "Arjun Varma", "photo": "user-12.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 6,
+    "name": "The Royal Voyager",
+    "slug": "the-royal-voyager",
+    "duration": 10,
+    "maxGroupSize": 15,
+    "difficulty": "medium",
+    "ratingsAverage": 4.8,
+    "ratingsQuantity": 51,
+    "price": 1250,
+    "summary": "Step back in time to the era of Maharajas, exploring majestic forts, opulent palaces, and vibrant desert markets.",
+    "description": "A 10-day tour to step back in time to the era of Maharajas. Explore majestic forts, opulent palaces, and vibrant desert markets in the heart of North India.\nDay 1: Arrive Jaipur, visit the City Palace\nDay 2-3: Explore Amer Fort, Jal Mahal and Hawa Mahal\nDay 4-5: Travel to Jodhpur, visit Mehrangarh Fort\nDay 6-7: Travel to Jaisalmer, enjoy a desert safari and tour the living fort\nDay 8: Long travel day to Udaipur\nDay 9: Explore the City Palace and take a boat ride on Lake Pichola\nDay 10: Visit Saheliyon Ki Bari and depart from Udaipur.",
+    "imageCover": "tour-7-cover.jpg",
+    "images": ["tour-7-1.jpg", "tour-7-2.jpg", "tour-7-3.jpg"],
+    "startDates": ["2024-10-10T09:00:00.000Z", "2025-02-05T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [75.7873, 26.9124], "description": "Jaipur, Rajasthan", "address": "Jaipur International Airport" },
+    "locations": [
+      { "type": "Point", "coordinates": [73.0243, 26.2389], "description": "Jodhpur", "day": 4 },
+      { "type": "Point", "coordinates": [70.9083, 26.9157], "description": "Jaisalmer", "day": 6 },
+      { "type": "Point", "coordinates": [73.7125, 24.5854], "description": "Udaipur", "day": 8 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Rajveer Singh", "photo": "user-13.jpg" },
+      { "role": "guide", "name": "Aditi Chauhan", "photo": "user-14.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 7,
+    "name": "The Himalayan Mystic",
+    "slug": "the-himalayan-mystic",
+    "duration": 5,
+    "maxGroupSize": 20,
+    "difficulty": "easy",
+    "ratingsAverage": 4.9,
+    "ratingsQuantity": 62,
+    "price": 600,
+    "summary": "Find inner peace amidst the soaring Himalayas with yoga, meditation, and rafting on the sacred Ganges.",
+    "description": "A 5-day spiritual journey of yoga, meditation, and thrilling white-water rafting on the sacred Ganges river.\nDay 1: Travel from Delhi to Haridwar\nDay 2: Witness Ganga Aarti in Haridwar, then travel to Rishikesh\nDay 3: Morning yoga session followed by white-water rafting\nDay 4: Visit the Beatles Ashram and Laxman Jhula bridge\nDay 5: Journey back to Delhi.",
+    "imageCover": "tour-8-cover.jpg",
+    "images": ["tour-8-1.jpg", "tour-8-2.jpg", "tour-8-3.jpg"],
+    "startDates": ["2025-03-01T09:00:00.000Z", "2025-04-10T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [77.2090, 28.6139], "description": "Delhi", "address": "Indira Gandhi International Airport" },
+    "locations": [
+      { "type": "Point", "coordinates": [78.1642, 29.9457], "description": "Haridwar", "day": 1 },
+      { "type": "Point", "coordinates": [78.2676, 30.0869], "description": "Rishikesh", "day": 2 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Gaurav Joshi", "photo": "user-15.jpg" },
+      { "role": "guide", "name": "Divya Negi", "photo": "user-16.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 8,
+    "name": "The Coffee & Coorg Adventurer",
+    "slug": "the-coffee-coorg-adventurer",
+    "duration": 4,
+    "maxGroupSize": 12,
+    "difficulty": "easy",
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 31,
+    "price": 420,
+    "summary": "Breathe in the aromatic air of Coorg, the 'Scotland of India,' exploring lush coffee plantations and waterfalls.",
+    "description": "A 4-day tour to breathe in the aromatic air of Coorg, the 'Scotland of India.' Stay in lush coffee plantations, trek to cascading waterfalls, and explore the serene Tibetan settlement of Bylakuppe.\nDay 1: Drive from Bengaluru to Coorg, visit Abbey Falls\nDay 2: Guided tour of a coffee plantation, sunset from Raja's Seat\nDay 3: Visit Dubare Elephant Camp and the Tibetan Golden Temple\nDay 4: Return drive to Bengaluru.",
+    "imageCover": "tour-9-cover.jpg",
+    "images": ["tour-9-1.jpg", "tour-9-2.jpg", "tour-9-3.jpg"],
+    "startDates": ["2024-09-15T09:00:00.000Z", "2024-10-20T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [77.5946, 12.9716], "description": "Bengaluru, Karnataka", "address": "Kempegowda International Airport Bengaluru" },
+    "locations": [
+      { "type": "Point", "coordinates": [75.7397, 12.4211], "description": "Madikeri, Coorg", "day": 1 },
+      { "type": "Point", "coordinates": [76.0857, 12.3508], "description": "Bylakuppe", "day": 3 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Nikhil Gowda", "photo": "user-17.jpg" },
+      { "role": "guide", "name": "Deepa Kumar", "photo": "user-18.jpg" }
+    ],
+    "reviews": []
+  },
+  {
+    "id": 9,
+    "name": "The Sun Seeker",
+    "slug": "the-sun-seeker",
+    "duration": 5,
+    "maxGroupSize": 25,
+    "difficulty": "easy",
+    "ratingsAverage": 4.6,
+    "ratingsQuantity": 78,
+    "price": 580,
+    "summary": "From vibrant beach parties in the north to serene sunsets in the south, experience the best of Goa.",
+    "description": "A 5-day tour to experience the best of Goa. Relish Portuguese heritage, delicious seafood, and the laid-back Susegad lifestyle.\nDay 1: Arrive and check into your hotel in North Goa\nDay 2: Explore Anjuna Flea Market and Baga Beach nightlife\nDay 3: Tour UNESCO churches in Old Goa, then travel south\nDay 4: Relax on the beautiful Palolem Beach\nDay 5: Visit Agonda Beach before departing.",
+    "imageCover": "tour-10-cover.jpg",
+    "images": ["tour-10-1.jpg", "tour-10-2.jpg", "tour-10-3.jpg"],
+    "startDates": ["2024-11-05T09:00:00.000Z", "2024-12-10T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [73.8311, 15.3803], "description": "Dabolim Airport, Goa", "address": "Goa International Airport" },
+    "locations": [
+      { "type": "Point", "coordinates": [73.7533, 15.5948], "description": "North Goa (Anjuna/Baga)", "day": 1 },
+      { "type": "Point", "coordinates": [73.9880, 15.4989], "description": "Old Goa", "day": 3 },
+      { "type": "Point", "coordinates": [74.0249, 15.0095], "description": "South Goa (Palolem)", "day": 4 }
+    ],
+    "guides": [
+      { "role": "lead-guide", "name": "Marco D'Souza", "photo": "user-19.jpg" },
+      { "role": "guide", "name": "Fatima Sheikh", "photo": "user-20.jpg" }
+    ],
+    "reviews": []
+  }
+]

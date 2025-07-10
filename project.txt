@@ -1,0 +1,3271 @@
+Skip to main content
+
+key
+Get API key
+Studio
+Dashboard
+Documentation
+open_in_new
+Pranathi G r
+Lost Backend Project Recovery
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+Perfect! The backend logic is now in place and ready to serve the data.
+All that's left is to hook up the tour.pug template to display the dynamic data for the specific tour we're viewing. Right now, it's just showing placeholder content for "The Park Camper".
+Our Final Goal for this step: Replace all the placeholder text and images in tour.pug with the actual data from the tour object we passed in from our route handler.
+Action: Update tour.pug with Dynamic Data
+Open your views/tour.pug file. We are going to replace all the static content with Pug variables. I will provide the complete, final code for the file at the end, but it's helpful to see what we're changing piece by piece.
+Key Changes We Will Make:
+Replace the hardcoded cover image with tour.imageCover.
+Replace the tour name with tour.name.
+Replace the duration and start location with tour.duration and tour.startLocation.description.
+Fill in all the "Quick facts" from the tour object.
+Update the "About" section with tour.description.
+Dynamically generate the three picture boxes from the tour.images array.
+...and a few other small fixes.
+Instead of doing it piece by piece, you can replace the entire content of views/tour.pug with the code below. This is the final, fully dynamic version.
+Generated pug
+//- views/tour.pug
+
+extends _layout
+
+block append head
+  //- This script will be for our Mapbox integration later
+  //- script(src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js')
+  //- link(href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css', rel='stylesheet')
+
+block content
+  section.section-header
+    .header__hero
+      .header__hero-overlay  
+      img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+
+    .heading-box
+      h1.heading-primary
+        span= `${tour.name}`
+      .heading-box__group
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-clock')
+          span.heading-box__text= `${tour.duration} days`
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-map-pin')
+          span.heading-box__text= tour.startLocation.description
+
+  section.section-description
+    .overview-box
+      div
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Quick facts
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-calendar')
+            span.overview-box__label Next date
+            span.overview-box__text= new Date(tour.startDates[0]).toLocaleString('en-us', {month: 'long', year: 'numeric'})
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-trending-up')
+            span.overview-box__label Difficulty
+            span.overview-box__text= tour.difficulty
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-user')
+            span.overview-box__label Participants
+            span.overview-box__text= `${tour.maxGroupSize} people`
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-star')
+            span.overview-box__label Rating
+            span.overview-box__text= `${tour.ratingsAverage} / 5`
+
+        //- NOTE: This section is a placeholder for when we have real guide data
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Your tour guides
+          each guide in tour.guides
+            .overview-box__detail
+              img.overview-box__img(src=`/img/users/${guide.photo}`, alt=`${guide.name}`)
+              span.overview-box__label= guide.role === 'lead-guide' ? 'Lead guide' : 'Tour guide'
+              span.overview-box__text= guide.name
+    
+    .description-box
+      h2.heading-secondary.ma-bt-lg= `About ${tour.name}`
+      //- The '!= operator in Pug tells it to not escape the HTML (so line breaks work)
+      - const paragraphs = tour.description.split('\n');
+      each p in paragraphs
+        p.description__text!= p
+
+  section.section-pictures
+    each img, i in tour.images
+      .picture-box
+        img.picture-box__img(src=`/img/tours/${img}`, alt=`${tour.name} scene ${i + 1}`)
+
+  section.section-map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+    //- The map will be rendered here by a client-side script later.
+
+  //- We will build the reviews section properly when we have a database
+  section.section-reviews
+    .reviews
+      each review in tour.reviews
+        .reviews__card
+          .reviews__avatar
+            img.reviews__avatar-img(src=`/img/users/${review.user.photo}`, alt=`${review.user.name}`)
+            h6.reviews__user= review.user.name
+          p.reviews__text= review.review
+          .reviews__rating
+            each star in [1, 2, 3, 4, 5]
+              svg.reviews__star(class=`reviews__star--${review.rating >= star ? 'active' : 'inactive'}`)
+                use(xlink:href='/img/icons.svg#icon-star')
+
+  section.section-cta
+    .cta
+      .cta__img.cta__img--logo
+        img(src='/img/logo-white.png', alt='TravelSaga logo')
+      img.cta__img.cta__img--1(src=`/img/tours/${tour.images[0]}`, alt='Tour Picture')
+      img.cta__img.cta__img--2(src=`/img/tours/${tour.images[1]}`, alt='Tour Picture')
+      .cta__content
+        h2.heading-secondary What are you waiting for?
+        p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+        button.btn.btn--green.span-all-rows Book tour now!
+
+---
+
+### Final Check
+
+1.  Save the updated `tour.pug` file.
+2.  Your `nodemon` server will restart.
+3.  Go to your homepage: `http://localhost:3000`
+4.  Click the "Details" button on any of your "TravelSaga India" tours.
+
+You should now be taken to the detail page for that specific tour, and it should be populated with all the correct information: the right name, duration, description, images, etc.
+
+**Note:** The map and the "Tour Guides" / "Reviews" sections will not work yet. This is expected. We need a database and some client-side JavaScript to power those features, which will be our next major steps.
+
+Let me know how it goes! If everything looks correct, we can move on to discussing the next steps like database integration or implementing the map.
+Use code with caution.
+Pug
+image.png
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+Of course! I see exactly what's happening from your screenshot.
+The error "Cannot GET /me" is very specific. It means your browser tried to visit the URL http://localhost:3000/me, but our Express server (app.js) has no instructions on what to do for that route. We've only told it how to handle / (the homepage) and /tour/:slug (the tour detail page).
+Let's build the "My Account" page so this link works. This will involve the same pattern as before:
+Create a new Pug template for the account page.
+Create a new route handler in app.js to render that template.
+Update the header to include a link to this new page.
+Step 1: Create the User Account Page Template (account.pug)
+This page will have a form for users to update their name and email, and another form to update their password.
+In your views folder, create a new file named account.pug.
+Copy and paste the entire code block below into this new file.
+Generated pug
+//- views/account.pug
+
+extends _layout
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        ul.side-nav
+          li.side-nav--active
+            a(href='#')
+              svg
+                use(xlink:href='/img/icons.svg#icon-settings')
+              | Settings
+          li
+            a(href='#')
+              svg
+                use(xlink:href='/img/icons.svg#icon-briefcase')
+              | My bookings
+          li
+            a(href='#')
+              svg
+                use(xlink:href='/img/icons.svg#icon-star')
+              | My reviews
+          li
+            a(href='#')
+              svg
+                use(xlink:href='/img/icons.svg#icon-credit-card')
+              | Billing
+
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Your account settings
+          //- We will add the action/method later
+          form.form.form-user-data
+            .form__group
+              label.form__label(for='name') Name
+              //- We pass in a dummy 'user' object for now
+              input#name.form__input(type='text', value=`${user.name}`, required)
+            .form__group.ma-bt-md
+              label.form__label(for='email') Email address
+              input#email.form__input(type='email', value=`${user.email}`, required)
+            .form__group.form__photo-upload
+              //- We're using a default user photo for now
+              img.form__user-photo(src='/img/users/default.jpg', alt='User photo')
+              a.btn-text(href='') Choose new photo
+            .form__group.right
+              button.btn.btn--small.btn--green Save settings
+
+        .line  
+
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Password change
+          //- We will add the action/method later
+          form.form.form-user-settings
+            .form__group
+              label.form__label(for='password-current') Current password
+              input#password-current.form__input(type='password', placeholder='••••••••', required, minlength='8')
+            .form__group
+              label.form__label(for='password') New password
+              input#password.form__input(type='password', placeholder='••••••••', required, minlength='8')
+            .form__group.ma-bt-lg
+              label.form__label(for='password-confirm') Confirm password
+              input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8')
+            .form__group.right
+              button.btn.btn--small.btn--green Save password
+Use code with caution.
+Pug
+Step 2: Create the Route in app.js
+Now, let's fix the "Cannot GET /me" error by creating the route handler. Since we don't have a real database or logged-in users yet, we will create a dummy user object to pass to the template, just so it has some data to display.
+Open app.js.
+Add the following code block after your other route handlers, but before app.listen.
+Generated javascript
+// Add this new route handler in app.js
+
+app.get('/me', (req, res) => {
+  // For now, we will just render the page without any real user data
+  // In a real app, we would get the user from the database
+  const user = {
+    name: 'Pranathi G R',
+    email: 'pranathi@example.com'
+  };
+
+  res.status(200).render('account', {
+    title: 'Your Account',
+    user: user // Pass the dummy user object to the template
+  });
+});
+Use code with caution.
+JavaScript
+Step 3: Update the Header Navigation (_layout.pug)
+Finally, let's update the main site navigation in the header so there are links to log in and view the account page.
+Open views/_layout.pug.
+Find the <nav class="nav nav--user"> section.
+Replace that entire section with the code below.
+Generated pug
+//- Find the nav.nav--user section in _layout.pug and replace it with this:
+
+nav.nav.nav--user
+  //- These links will show if the user is NOT logged in.
+  //- We will add logic to switch between them later.
+  a.nav__el(href='#') Log in
+  a.nav__el.nav__el--cta(href='#') Sign up
+  
+  //- These links will show if the user IS logged in. For now, we show both.
+  //- a.nav__el(href='#') My bookings
+  //- a.nav__el(href='/me') 
+  //-   img.nav__user-img(src='img/users/default.jpg', alt='User photo')
+  //-   span Pranathi
+Use code with caution.
+Pug
+After making these changes, save all your files.
+Now, when you go to http://localhost:3000/me, you will no longer get an error. You will see your new "Your Account" page, pre-filled with the dummy data.
+What's Next?
+The forms on this page look great, but the "Save settings" and "Save password" buttons don't do anything yet. Our next major step in the project will be to set up a database (like MongoDB) and learn how to handle form submissions (POST requests) to actually save user data.
+Let me know when you've got the account page showing up
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+Thank you! This is absolutely perfect. Having all the files gives me a complete and clear understanding of the entire project. I can see you've made incredible progress, moving from a simple file-based server to a full-stack MVC application with a database and authentication. This is fantastic work!
+I have analyzed all the files, and I've found the two key issues:
+A small copy-paste error in tour.pug.
+The reason your map is not showing all the locations.
+Let's go through it step-by-step.
+The Big Picture: Your Project is Now a Real Application
+First, it's important to understand that your app.js is now a professional "main hub". It no longer reads from a JSON file. Instead, it connects to a MongoDB database and uses routers (viewRouter, tourRouter, userRouter) to handle requests. This is the correct way to build a scalable application.
+The code you provided for app.js is very good and well-structured. It does not need any changes.
+Part 1: Fixing the Map Issue
+You are correct, the map is not showing all the locations.
+The Diagnosis: Your leafletmap.js file is 100% correct. The problem is not in the map script. The problem is in the data that is being sent from your server to the tour.pug template.
+In an MVC application like yours, the process is:
+A request comes in for a tour page (e.g., /tour/the-sun-seeker).
+Your viewRouter handles this.
+It calls a function in your tourController (e.g., getTour).
+The tourController fetches the tour data from your MongoDB database using your tourModel.
+It renders tour.pug, passing the tour data to it.
+The problem is almost certainly happening in step 4. When your tourController fetches the tour from the database, it's likely not "populating" the locations, guides, and reviews data correctly. These are separate collections in your database that need to be explicitly joined to the tour document.
+To fix this, I need to see the code that fetches the data.
+Part 2: Correcting the tour.pug File
+You had a small copy-paste error where extends _layout was on the same line as the file name. I have fixed this and made one small adjustment to the map element.
+Replace the entire content of views/tour.pug with this corrected version:
+Generated pug
+//- views/tour.pug
+extends _layout
+
+block head
+  link(rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="")
+  script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="")
+
+block content
+  section.section-header
+    .header__hero
+      .header__hero-overlay  
+      img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+
+    .heading-box
+      h1.heading-primary
+        span= `${tour.name}`
+      .heading-box__group
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-clock')
+          span.heading-box__text= `${tour.duration} days`
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-map-pin')
+          span.heading-box__text= tour.startLocation.description
+
+  section.section-description
+    .overview-box
+      div
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Quick facts
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-calendar')
+            span.overview-box__label Next date
+            span.overview-box__text= new Date(tour.startDates[0]).toLocaleString('en-us', {month: 'long', year: 'numeric'})
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-trending-up')
+            span.overview-box__label Difficulty
+            span.overview-box__text= tour.difficulty
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-user')
+            span.overview-box__label Participants
+            span.overview-box__text= `${tour.maxGroupSize} people`
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-star')
+            span.overview-box__label Rating
+            span.overview-box__text= `${tour.ratingsAverage} / 5`
+
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Your tour guides
+          if tour.guides
+            each guide in tour.guides
+              .overview-box__detail
+                img.overview-box__img(src=`/img/users/${guide.photo}`, alt=`${guide.name}`)
+                span.overview-box__label= guide.role === 'lead-guide' ? 'Lead guide' : 'Tour guide'
+                span.overview-box__text= guide.name
+    
+    .description-box
+      h2.heading-secondary.ma-bt-lg= `About ${tour.name}`
+      if tour.description
+        - const paragraphs = tour.description.split('\n');
+        each p in paragraphs
+          p.description__text!= p
+
+  section.section-pictures
+    each img, i in tour.images
+      .picture-box
+        img.picture-box__img(src=`/img/tours/${img}`, alt=`${tour.name} scene ${i + 1}`)
+
+  section.section-map
+    //- The data-locations attribute is where the map script gets its data
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+
+  section.section-reviews
+    .reviews
+      if tour.reviews
+        each review in tour.reviews
+          .reviews__card
+            .reviews__avatar
+              img.reviews__avatar-img(src=`/img/users/${review.user.photo}`, alt=`${review.user.name}`)
+              h6.reviews__user= review.user.name
+            p.reviews__text= review.review
+            .reviews__rating
+              each star in [1, 2, 3, 4, 5]
+                svg.reviews__star(class=`reviews__star--${review.rating >= star ? 'active' : 'inactive'}`)
+                  use(xlink:href='/img/icons.svg#icon-star')
+
+  section.section-cta
+    .cta
+      .cta__img.cta__img--logo
+        img(src='/img/logo-white.png', alt='TravelSaga logo')
+      img.cta__img.cta__img--1(src=`/img/tours/${tour.images[0]}`, alt='Tour Picture')
+      img.cta__img.cta__img--2(src=`/img/tours/${tour.images[1]}`, alt='Tour Picture')
+      .cta__content
+        h2.heading-secondary What are you waiting for?
+        p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+        button.btn.btn--green.span-all-rows Book tour now!
+Use code with caution.
+Pug
+Changes Made:
+Fixed the extends _layout line.
+Added if tour.guides and if tour.reviews to prevent errors if that data isn't populated.
+Cleaned up the #map element.
+Part 3: Confirmation of Your Other Files
+Your other files are excellent and do not need any changes.
+Correct: _layout.pug, overview.pug, login.pug, signup.pug, account.pug
+Correct: leafletmap.js, login.js
+Correct: app.js
+You have structured everything very well.
+ACTION: Let's Fix the Data Flow (And the Map!)
+To solve the map problem once and for all, I need to see the code that is responsible for getting the tour data from MongoDB.
+Please provide the code for the following 3 files:
+routes/viewRoutes.js
+(This file tells the app what to do when someone visits a page like / or /tour/:slug).
+controllers/viewController.js
+(This file contains the logic that viewRoutes calls, specifically the getTour function).
+models/tourModel.js
+(This is your Mongoose schema for tours. It's crucial for understanding how data is referenced).
+Once I see those, I can give you the exact line of code to add to your database query (it will likely be a .populate('locations')) which will fix the map and complete your application's data flow.
+You are incredibly close! Let's get this final piece sorted out.
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+You have caught another excellent point. My apologies. That error is a direct result of a mistake in the code I provided. You are 100% correct to point it out.
+The Diagnosis
+The error message is the key:
+Cannot read properties of undefined (reading 'name')
+This means that in your account.pug template, the code value=\${user.name}`is trying to run, but theuserobject itself isundefined`.
+Looking at the call stack, the error happens when getAccount in your viewController.js tries to render the page. This tells us exactly what's wrong:
+The getAccount function is rendering the account.pug template but is not providing it with the user object that the template needs.
+Your other pages (like the header on the homepage) work because your authController.isLoggedIn middleware correctly places the logged-in user's data into res.locals.user. However, the account.pug template is specifically looking for a user variable passed directly to it.
+The Solution: Correct viewController.js
+We need to fix the getAccount function to explicitly pass the user's data to the account.pug template. The user's data is already available to us in the controller at res.locals.user.
+Replace the getAccount function in controllers/viewController.js with this corrected version:
+Generated javascript
+// In controllers/viewController.js
+
+// --- THIS IS THE CORRECTED FUNCTION ---
+exports.getAccount = (req, res) => {
+  res.status(200).render('account', {
+    title: 'Your Account'
+    // By adding the line below, we are now passing the 'user' object
+    // that the template needs. It gets this data from the `isLoggedIn` middleware.
+    // user: res.locals.user 
+  });
+};
+Use code with caution.
+JavaScript
+Wait, there's a better way. My isLoggedIn middleware in app.js is not doing its job correctly. Let's fix that instead, because it's the root cause. We want all templates to have access to the user if they are logged in.
+The Better, Final Solution: Fix the Root Cause in app.js
+Your app.js is missing the crucial middleware that makes the user data available to all templates. Let's add it.
+Replace the entire content of your app.js with this corrected and complete version. This is the definitive fix.
+Generated javascript
+// app.js
+
+const path = require('path');
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+const viewRouter = require('./routes/viewRoutes');
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+const authController = require('./controllers/authController');
+
+dotenv.config({ path: './.env' });
+const app = express();
+
+// --- DATABASE CONNECTION ---
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
+mongoose.connect(DB).then(() => console.log('DB connection successful!'));
+
+// --- TEMPLATE ENGINE ---
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// --- GLOBAL MIDDLEWARE ---
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: '10kb' }));
+// Cookie parser
+app.use(cookieParser());
+
+// --- THIS IS THE CRUCIAL MIDDLEWARE THAT FIXES YOUR PROBLEM ---
+// This code runs on every request. It checks if the user is logged in
+// and if so, it adds the user data to `res.locals`.
+// Anything in `res.locals` is automatically available in all Pug templates.
+app.use(authController.isLoggedIn);
+
+// --- MOUNTING THE ROUTERS ---
+app.use('/', viewRouter);
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
+
+// --- START THE SERVER ---
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`App running on port ${port}...`);
+});
+Use code with caution.
+JavaScript
+What this new app.js does:
+It correctly sets up all the middleware.
+The key line is app.use(authController.isLoggedIn);.
+This middleware will run for every single request.
+Inside your authController, the isLoggedIn function will verify the JWT cookie. If it's valid, it will fetch the user from the database and attach it to res.locals.user.
+Pug templates automatically have access to anything in res.locals. So now, when account.pug asks for user.name, the user object will be there, and the error will be gone.
+This one change in app.js fixes the problem for the /me page and ensures it won't happen on any future pages you create. It's the proper, scalable solution.
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+Of course! Thank you for clarifying. The new problem is that the logout button is not working.
+This is a very common issue, and it's almost always because the backend is missing the logic to handle the logout request that the frontend is sending.
+Your frontend code in login.js is correct. When you click the logout button, it sends a GET request to the URL: /api/v1/users/logout.
+Your app.js is also correct. It correctly directs any request starting with /api/v1/users to your userRouter.
+The problem is that we haven't created the route and the controller function for logout on the backend.
+The Solution: Implement the Logout Functionality on the Backend
+We need to do two things:
+Create the logout function in your authController.js.
+Add the corresponding route in userRoutes.js.
+Step 1: Create the Logout Controller Function
+The "logout" process for JWT cookies is simple: you send the browser a new cookie with the same name, but with an expired date. The browser will then delete the old, valid cookie.
+Open controllers/authController.js and add this logout function:
+Generated javascript
+// In controllers/authController.js
+
+// ... (at the top, you should have your other imports like User, jwt, etc.)
+
+// ... (your existing signup, login, protect, isLoggedIn functions are here) ...
+
+
+// ADD THIS ENTIRE FUNCTION
+exports.logout = (req, res) => {
+  // To log out, we send a new cookie with a short expiry time.
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000), // Expires in 10 seconds
+    httpOnly: true // Ensures the cookie cannot be accessed by the browser's JS
+  });
+
+  // Send a success status back to the client
+  res.status(200).json({ status: 'success' });
+};
+Use code with caution.
+JavaScript
+Step 2: Create the Logout Route
+Now, we need to connect the URL /api/v1/users/logout to the logout function we just created.
+Open routes/userRoutes.js and add the new route:
+Generated javascript
+// In routes/userRoutes.js
+
+const express = require('express');
+const authController = require('../controllers/authController');
+const userController = require('../controllers/userController');
+
+const router = express.Router();
+
+// Public routes (anyone can access)
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+
+// --- ADD THIS LINE FOR LOGOUT ---
+router.get('/logout', authController.logout);
+
+
+// Routes below this point are protected (you must be logged in)
+// router.use(authController.protect); // You will add this later
+
+// ... (any other user routes like /me, /updateMyPassword, etc., go here)
+
+router
+  .route('/')
+  .get(userController.getAllUsers)
+  .post(userController.createUser);
+
+router
+  .route('/:id')
+  .get(userController.getUser)
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
+
+
+module.exports = router;
+Use code with caution.
+JavaScript
+How It Works Now:
+Frontend: You click the "LOG OUT" button. login.js sends a GET request to /api/v1/users/logout.
+Routing: app.js passes the request to userRouter. The userRouter finds a match: router.get('/logout', ...).
+Controller: It calls your new authController.logout function.
+Backend Logic: The logout function creates a new jwt cookie that expires almost immediately and sends it to the browser. It also sends a status: 'success' JSON response.
+Frontend: Back in login.js, the fetch request receives the successful response (res.ok is true).
+Reload: The location.reload(true) line is executed, and the page reloads. Because the valid jwt cookie is now gone, your isLoggedIn middleware will no longer find a logged-in user, and the header will correctly show "Log in" and "Sign up".
+Save both files, let your server restart, and your logout button should now work perfectly.
+image.png
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+That is an excellent and crucial question. Thank you for asking.
+No, the password change form is not functional yet.
+You have correctly identified the next major step in our project. Right now, the form is just a visual template. If you fill it out and click "Save Password", nothing will happen because we haven't written the JavaScript to send the data or the backend API endpoint to receive and process it.
+Let's make it fully functional now. This is a three-part process:
+Frontend (JavaScript): Add code to login.js to capture the form data and send it to a new API endpoint.
+Backend (Route): Create the new API route in userRoutes.js to handle password updates.
+Backend (Controller): Create the controller function in authController.js to securely process the password change.
+Step 1: Add the Frontend Logic to login.js
+This code will listen for the "Save Password" button click, collect the passwords, and send them to the server.
+Open public/js/login.js and add this entire block of code to the bottom of the file:
+Generated javascript
+// In public/js/login.js
+
+// --- ADD THIS ENTIRE BLOCK ---
+
+// This function will handle updating user data (name/email or password)
+const updateSettings = async (data, type) => {
+  try {
+    const url =
+      type === 'password'
+        ? '/api/v1/users/updateMyPassword'
+        : '/api/v1/users/updateMe';
+
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const resData = await res.json();
+
+    if (resData.status === 'success') {
+      showAlert('success', `Password updated successfully!`);
+    } else {
+      showAlert('error', resData.message);
+    }
+  } catch (err) {
+    showAlert('error', err.message);
+  }
+};
+
+
+// Event Listener for the Password Change Form
+const userPasswordForm = document.querySelector('.form-user-settings');
+if (userPasswordForm) {
+  userPasswordForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelector('.btn--save-password').textContent = 'Updating...';
+
+    const passwordCurrent = document.getElementById('password-current').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+
+    await updateSettings({ passwordCurrent, password, passwordConfirm }, 'password');
+
+    // Clear fields and restore button text
+    document.getElementById('password-current').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('password-confirm').value = '';
+    document.querySelector('.btn--save-password').textContent = 'Save password';
+  });
+}
+Use code with caution.
+JavaScript
+Note: I've named the main function updateSettings so we can reuse it later for the "Save Settings" button.
+Step 2: Create the Backend Route in userRoutes.js
+We need an endpoint that is protected, ensuring only a logged-in user can access it.
+Open routes/userRoutes.js and add the new route:
+Generated javascript
+// In routes/userRoutes.js
+
+const express = require('express');
+const authController = require('../controllers/authController');
+
+const router = express.Router();
+
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+router.get('/logout', authController.logout);
+
+// --- ADD THIS LINE ---
+// This route will be protected. Only logged-in users can update their password.
+router.patch(
+  '/updateMyPassword',
+  authController.protect, // First, ensure user is logged in
+  authController.updateMyPassword // Then, run the update logic
+);
+
+
+// ... (any other routes you have)
+
+module.exports = router;
+Use code with caution.
+JavaScript
+Step 3: Implement the Controller Logic in authController.js
+This is the most important part. It handles the security of the password update process.
+Open controllers/authController.js and add this entire function:
+Generated javascript
+// In controllers/authController.js
+const User = require('../models/userModel'); // Make sure User model is imported
+const jwt = require('jsonwebtoken'); // Make sure JWT is imported
+
+// ... (your existing functions like signup, login, protect, etc.) ...
+
+// --- ADD THIS ENTIRE FUNCTION ---
+exports.updateMyPassword = async (req, res, next) => {
+  try {
+    // 1) Get user from collection (the user ID is on req.user from the protect middleware)
+    // We use .select('+password') to explicitly include the password field, which is normally hidden.
+    const user = await User.findById(req.user.id).select('+password');
+
+    // 2) Check if POSTed current password is correct
+    const { passwordCurrent, password, passwordConfirm } = req.body;
+    if (!(await user.correctPassword(passwordCurrent, user.password))) {
+      // If the passwords do not match, send an error.
+      // You should have an AppError class for this, but a simple send works for now.
+      return res.status(401).json({ status: 'fail', message: 'Your current password is a wrong.' });
+    }
+
+    // 3) If so, update password
+    user.password = password;
+    user.passwordConfirm = passwordConfirm;
+    await user.save(); // This will run the validation and pre-save hooks in your model
+
+    // 4) Log user in, send JWT
+    // Re-issue a new token and send it.
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN
+    });
+
+    res.cookie('jwt', token, {
+      expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+      httpOnly: true
+    });
+
+    res.status(200).json({
+      status: 'success',
+      token
+    });
+
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+};
+Use code with caution.
+JavaScript
+Assumption: Your userModel has a method called correctPassword that uses bcrypt.compare() to check the password. If it doesn't, let me know, and I can provide that code.
+After adding these three pieces, your "Password Change" form will be fully functional and secure.
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+
+C:\Users\praga\OneDrive\Desktop\backend1\routes\tourRoutes.js:27
+  .patch(authController.protect, tourController.updateTour) // Protect updates
+         ^
+
+ReferenceError: authController is not defined
+    at Object.<anonymous> (C:\Users\praga\OneDrive\Desktop\backend1\routes\tourRoutes.js:27:10)
+    at Module._compile (node:internal/modules/cjs/loader:1256:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1310:10)
+    at Module.load (node:internal/modules/cjs/loader:1119:32)
+    at Module._load (node:internal/modules/cjs/loader:960:12)
+    at Module.require (node:internal/modules/cjs/loader:1143:19)
+    at require (node:internal/modules/cjs/helpers:119:18)
+    at Object.<anonymous> (C:\Users\praga\OneDrive\Desktop\backend1\app.js:12:20)
+    at Module._compile (node:internal/modules/cjs/loader:1256:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1310:10)
+
+Node.js v18.18.2
+[nodemon] app crashed - waiting for file changes before starting...
+You have found the exact error! My apologies. I provided the code snippet but forgot to include the most important line.
+The error message is perfect: ReferenceError: authController is not defined.
+This means that in your tourRoutes.js file, you are trying to use the variable authController before you have told the file what that variable is.
+The Solution: Import authController
+You just need to add one line at the top of your tourRoutes.js file to import the authController.
+Here is the complete and corrected routes/tourRoutes.js file:
+Generated javascript
+// routes/tourRoutes.js
+
+const express = require('express');
+const tourController = require('../controllers/tourController');
+// --- THIS IS THE MISSING LINE THAT FIXES THE ERROR ---
+const authController = require('../controllers/authController');
+
+const router = express.Router();
+
+// You can use router.param for pre-filling or validating parameters
+// router.param('id', tourController.checkID);
+
+router
+  .route('/')
+  .get(tourController.getAllTours)
+  // Protect the createTour route so only logged-in admins can do it
+  .post(
+    authController.protect,
+    // authController.restrictTo('admin', 'lead-guide'), // You can add this later for roles
+    tourController.createTour
+  );
+
+router
+  .route('/:id')
+  .get(tourController.getTour)
+  // Protect the updateTour route
+  .patch(
+    authController.protect,
+    // authController.restrictTo('admin', 'lead-guide'),
+    tourController.updateTour
+  )
+  // Protect the deleteTour route
+  .delete(
+    authController.protect,
+    // authController.restrictTo('admin'),
+    tourController.deleteTour
+  );
+
+module.exports = router;
+Use code with caution.
+JavaScript
+Why this works:
+const authController = require('../controllers/authController'); tells Node.js to load the authController.js file and assign all its exported functions (like protect) to the authController variable.
+Now, when the code reaches .patch(authController.protect, ...) and .delete(authController.protect, ...), it knows exactly what authController is and can find the protect function inside it.
+Please replace the content of your routes/tourRoutes.js with this corrected version. Save the file, and your server will restart without the crash. You can then proceed with the Postman request.
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+Excellent idea. This focuses on a very specific and beautiful part of Karnataka—the "Malnad" or Western Ghats region—blending spiritual pilgrimage with stunning mountain and rainforest scenery. This will create a compact but very interesting route on the map.
+Here is a third tour designed around your request, connecting the sacred town of Dharmasthala with the lush, green peaks of the Kudremukh region.
+Tour 3: The Pilgrim's Peak Trail
+This tour is designed for travelers seeking both spiritual solace and an escape into raw, untamed nature. It's a journey from one of Karnataka's most revered temples to the misty, biodiverse grasslands and forests of a famous mountain peak.
+Theme: Pilgrimage, Mountains, and Rainforests.
+Difficulty: Medium (includes trekking options).
+Duration: 5 Days / 4 Nights
+Start/End Point: Mangalore
+Day-by-Day Itinerary:
+Day 1: Arrival & Spiritual Dharmasthala
+Arrive at Mangalore airport and travel inland to the sacred town of Dharmasthala in the Belthangady taluk.
+Visit the renowned Sri Manjunatha Temple, a unique place of worship managed by a Jain administration, promoting religious tolerance.
+Explore the serene surroundings and witness the disciplined system of free food distribution (Annadana).
+Day 2: Journey to the Hills of Kudremukh
+Travel from the plains up into the heart of the Western Ghats, towards the Kudremukh region.
+The journey itself is scenic, passing through dense forests and small villages.
+Check into your homestay or nature camp near the national park, a base for your exploration.
+Day 3: Exploring Kudremukh National Park
+Dedicate the day to exploring the breathtaking landscapes of Kudremukh National Park. (Note: The main Kudremukh peak trek requires permits, so we will focus on accessible areas).
+Visit viewpoints that offer stunning vistas of the rolling, velvet-green "shola" grasslands and forests.
+Take a short, guided nature walk to spot local flora and fauna, including birds and possibly the Malabar giant squirrel.
+Day 4: Waterfalls and Scenic Drives
+Visit a nearby waterfall like Hanuman Gundi Falls, which requires a short walk down to see the cascade in its natural setting.
+Enjoy a scenic drive through the region, appreciating the lush greenery and the tranquility of the mountains.
+Spend the evening relaxing at your nature stay.
+Day 5: Return to the Coast
+After a final mountain breakfast, make the journey back down from the ghats to Mangalore for your departure, carrying the peace of both the temple and the mountains.
+This "Pilgrim's Peak Trail" provides a wonderful contrast to the coastal and southern loop tours. You now have three distinct Karnataka itineraries:
+The Golden Coast Explorer (Coastal/Temples)
+Kingdoms & Coffee Trails (Palaces/Wildlife/Hills)
+The Pilgrim's Peak Trail (Pilgrimage/Mountains/Rainforests)
+Shall I now generate the final tours.json file containing all three of these new Karnataka tours for you?
+ Backwaters & Houseboats
+Alleppey (Alappuzha) – Famous for houseboat cruises through scenic backwaters and paddy fields.
+
+Kumarakom – Peaceful backwaters, bird sanctuary, luxurious resorts.
+
+Kollam – Ashtamudi Lake, boat cruises to Alleppey.
+
+🏔️ Hill Stations
+Munnar – Tea plantations, Eravikulam National Park, Anamudi Peak, Mattupetty Dam.
+
+Wayanad – Edakkal Caves, Soochipara Falls, Banasura Sagar Dam, trekking.
+
+Thekkady – Periyar Wildlife Sanctuary, bamboo rafting, spice plantations.
+
+Vagamon – Pine forests, rolling meadows, and offbeat hill beauty.
+
+🏖️ Beaches & Coastal Getaways
+Kovalam – Lighthouse Beach, surfing, Ayurvedic massages.
+
+Varkala – Cliff-side beach, Janardanaswamy Temple, beach cafes.
+
+Marari Beach – Near Alleppey, peaceful and uncrowded.
+
+Bekal – Bekal Fort by the sea, clean beach.
+
+🏯 Culture, History & Heritage
+Fort Kochi – Chinese fishing nets, colonial architecture, Jewish Synagogue, Mattancherry Palace.
+
+Thrissur – Vadakkunnathan Temple, Thrissur Pooram festival.
+
+Thiruvananthapuram – Padmanabhaswamy Temple, Napier Museum, city beaches.
+
+Palakkad – Palakkad Fort, Silent Valley National Park.
+
+🐘 Wildlife & Nature
+Periyar National Park – Thekkady region, boating, wildlife watching (elephants, bison, tigers).
+
+Silent Valley National Park – Undisturbed rainforest, rich biodiversity.
+
+Parambikulam Tiger Reserve – Forest treks, bamboo rafting.
+
+Eravikulam National Park – Home to Nilgiri Tahr and Neelakurinji (bloom every 12 years).
+
+🕌 Pilgrimage & Spiritual Places
+Sabarimala – Major pilgrimage site dedicated to Lord Ayyappa.
+
+Guruvayur – Krishna temple, elephant sanctuary.
+
+Attukal Bhagavathy Temple – Known for Attukal Pongala festival.
+
+✨ Unique Experiences
+Athirapally Falls – Kerala’s Niagara, featured in many Indian movies.
+
+Kalaripayattu & Kathakali – Traditional martial art and dance form, especially around Kochi and Thekkady.
+
+Ayurveda Retreats – Available in Kovalam, Wayanad, and Thekkady.
+2 tours from kerala
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+That's a very thoughtful question! No, thank you, I have the format ready from our previous work.
+I will generate the complete JSON for all 10 tours, ensuring every object has the required fields like name, slug, duration, price, summary, locations, etc. Most importantly, I will make sure the locations array for each tour is complete for every day, with slightly adjusted coordinates for multi-day stays to ensure all map pins are visible.
+Action Plan: Your Final Update
+Here is the final, complete tours.json file containing all 10 new tours.
+Update the File: Open dev-data/data/tours.json in your project. Delete all of its current content.
+Copy & Paste: Copy the entire JSON block below and paste it into the empty tours.json file.
+Delete Old Database Data: Open your terminal in the project's root folder and run the delete script:
+Generated bash
+node dev-data/data/import-dev-data.js --delete
+Use code with caution.
+Bash
+Import New Database Data: After the delete script finishes, run the import script:
+Generated bash
+node dev-data/data/import-dev-data.js --import
+Use code with caution.
+Bash
+After these steps, your website will be powered by this brand new, diverse set of 10 tours.
+Paste This Entire Block into dev-data/data/tours.json
+Generated json
+[
+  {
+    "name": "The Maratha Legacy Trail",
+    "slug": "the-maratha-legacy-trail",
+    "duration": 5,
+    "maxGroupSize": 14,
+    "difficulty": "easy",
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 25,
+    "price": 497,
+    "summary": "Explore the heart of the Maratha Empire, from grand palaces in Pune to the formidable Sinhagad Fort and serene Lonavala.",
+    "description": "A 5-day journey into the historical heartland of Maharashtra. Discover the stories of warriors and kings at Pune's grand palaces and the mighty Sinhagad Fort. Then, unwind amidst the lush green hills and misty valleys of Lonavala, exploring ancient caves and scenic viewpoints.",
+    "imageCover": "tour-1-cover.jpg",
+    "images": ["tour-1-1.jpg", "tour-1-2.jpg", "tour-1-3.jpg"],
+    "startDates": ["2024-10-15T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [73.8567, 18.5204], "description": "Pune, Maharashtra" },
+    "locations": [
+      { "type": "Point", "coordinates": [73.8567, 18.5204], "description": "Pune City Exploration", "day": 1 },
+      { "type": "Point", "coordinates": [73.7551, 18.3663], "description": "Sinhagad Fort", "day": 2 },
+      { "type": "Point", "coordinates": [73.4072, 18.7500], "description": "Lonavala", "day": 3 },
+      { "type": "Point", "coordinates": [73.4090, 18.7518], "description": "Lonavala Viewpoints", "day": 4 },
+      { "type": "Point", "coordinates": [73.8567, 18.5204], "description": "Departure from Pune", "day": 5 }
+    ]
+  },
+  {
+    "name": "Caves of Divinity: Ajanta & Ellora",
+    "slug": "caves-of-divinity-ajanta-ellora",
+    "duration": 5,
+    "maxGroupSize": 18,
+    "difficulty": "medium",
+    "ratingsAverage": 4.9,
+    "ratingsQuantity": 62,
+    "price": 650,
+    "summary": "Journey back in time to witness the breathtaking rock-cut temples of Ajanta and Ellora, a testament to ancient artistry.",
+    "description": "Embark on a 5-day historical pilgrimage to the UNESCO World Heritage sites of Ajanta and Ellora. Starting from the historic city of Aurangabad, you'll explore the formidable Daulatabad Fort before dedicating full days to the stunning painted narratives of Ajanta and the monolithic sculptural wonders of Ellora.",
+    "imageCover": "tour-2-cover.jpg",
+    "images": ["tour-2-1.jpg", "tour-2-2.jpg", "tour-2-3.jpg"],
+    "startDates": ["2024-11-25T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [75.3433, 19.8762], "description": "Aurangabad, Maharashtra" },
+    "locations": [
+      { "type": "Point", "coordinates": [75.1770, 19.9774], "description": "Daulatabad Fort", "day": 1 },
+      { "type": "Point", "coordinates": [75.7033, 20.5511], "description": "Ajanta Caves", "day": 2 },
+      { "type": "Point", "coordinates": [75.1775, 20.0258], "description": "Ellora Caves", "day": 3 },
+      { "type": "Point", "coordinates": [75.3433, 19.8762], "description": "Aurangabad City Sights", "day": 4 },
+      { "type": "Point", "coordinates": [75.3451, 19.8780], "description": "Departure from Aurangabad", "day": 5 }
+    ]
+  },
+  {
+    "name": "Coastal Charm & Vineyard Trails",
+    "slug": "coastal-charm-vineyard-trails",
+    "duration": 5,
+    "maxGroupSize": 12,
+    "difficulty": "easy",
+    "ratingsAverage": 4.6,
+    "ratingsQuantity": 33,
+    "price": 750,
+    "summary": "A modern journey from Mumbai's coast to the rolling hills and sophisticated vineyards of Nashik.",
+    "description": "Experience the best of modern Maharashtra. Start with the iconic sights of Mumbai, escape to the coastal town of Alibaug for a dose of sea breeze, and culminate your journey in Nashik, India's wine capital, with guided tours and tastings.",
+    "imageCover": "tour-3-cover.jpg",
+    "images": ["tour-3-1.jpg", "tour-3-2.jpg", "tour-3-3.jpg"],
+    "startDates": ["2024-12-01T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [72.8777, 19.0760], "description": "Mumbai, Maharashtra" },
+    "locations": [
+      { "type": "Point", "coordinates": [72.8777, 19.0760], "description": "Mumbai City", "day": 1 },
+      { "type": "Point", "coordinates": [72.8710, 18.6476], "description": "Alibaug", "day": 2 },
+      { "type": "Point", "coordinates": [73.7898, 19.9975], "description": "Nashik", "day": 3 },
+      { "type": "Point", "coordinates": [73.7916, 19.9993], "description": "Nashik Vineyards", "day": 4 },
+      { "type": "Point", "coordinates": [72.8777, 19.0760], "description": "Departure from Mumbai", "day": 5 }
+    ]
+  },
+  {
+    "name": "The Golden Coast Explorer",
+    "slug": "the-golden-coast-explorer",
+    "duration": 5,
+    "maxGroupSize": 16,
+    "difficulty": "easy",
+    "ratingsAverage": 4.8,
+    "ratingsQuantity": 41,
+    "price": 550,
+    "summary": "A classic coastal journey along Karnataka's beautiful shoreline, from Udupi to Murudeshwar and Gokarna.",
+    "description": "Discover the tranquil beaches and sacred temples of Karnataka's coastline. This journey takes you from the unique rock formations of St. Mary's Island to the towering Shiva statue of Murudeshwar, ending in the peaceful, bohemian vibe of Gokarna's famous beaches.",
+    "imageCover": "tour-4-cover.jpg",
+    "images": ["tour-4-1.jpg", "tour-4-2.jpg", "tour-4-3.jpg"],
+    "startDates": ["2025-02-15T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [74.8560, 12.9141], "description": "Mangalore, Karnataka" },
+    "locations": [
+      { "type": "Point", "coordinates": [74.7421, 13.3323], "description": "Udupi", "day": 1 },
+      { "type": "Point", "coordinates": [74.4735, 14.0934], "description": "Murudeshwar", "day": 2 },
+      { "type": "Point", "coordinates": [74.3188, 14.5479], "description": "Gokarna", "day": 3 },
+      { "type": "Point", "coordinates": [74.3206, 14.5461], "description": "Gokarna Beaches", "day": 4 },
+      { "type": "Point", "coordinates": [74.3170, 14.5497], "description": "Departure from Gokarna", "day": 5 }
+    ]
+  },
+  {
+    "name": "Kingdoms & Coffee Trails",
+    "slug": "kingdoms-coffee-trails",
+    "duration": 5,
+    "maxGroupSize": 12,
+    "difficulty": "medium",
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 38,
+    "price": 850,
+    "summary": "A royal loop through South Karnataka's palaces, wildlife sanctuaries, and misty coffee estates.",
+    "description": "Experience the rich diversity of South Karnataka. Begin in the royal city of Mysuru, then venture into the wild heart of Nagarhole National Park for a chance to spot elephants and tigers. Conclude your trip in the cool, aromatic coffee plantations of Coorg.",
+    "imageCover": "tour-5-cover.jpg",
+    "images": ["tour-5-1.jpg", "tour-5-2.jpg", "tour-5-3.jpg"],
+    "startDates": ["2024-11-10T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [77.5946, 12.9716], "description": "Bengaluru, Karnataka" },
+    "locations": [
+      { "type": "Point", "coordinates": [76.6552, 12.2958], "description": "Mysuru", "day": 1 },
+      { "type": "Point", "coordinates": [76.1265, 12.0300], "description": "Nagarhole National Park", "day": 2 },
+      { "type": "Point", "coordinates": [75.7397, 12.4211], "description": "Coorg", "day": 3 },
+      { "type": "Point", "coordinates": [75.7415, 12.4229], "description": "Coorg Coffee Estates", "day": 4 },
+      { "type": "Point", "coordinates": [77.5946, 12.9716], "description": "Departure from Bengaluru", "day": 5 }
+    ]
+  },
+  {
+    "name": "The Pilgrim's Peak Trail",
+    "slug": "the-pilgrims-peak-trail",
+    "duration": 5,
+    "maxGroupSize": 10,
+    "difficulty": "medium",
+    "ratingsAverage": 4.6,
+    "ratingsQuantity": 19,
+    "price": 600,
+    "summary": "A spiritual and natural journey from the revered Dharmasthala temple to the lush mountain peaks of Kudremukh.",
+    "description": "Find solace for the soul and adventure for the spirit. This unique tour begins at the sacred Dharmasthala temple before taking you deep into the Western Ghats to explore the stunning shola grasslands and dense forests of the Kudremukh region.",
+    "imageCover": "tour-6-cover.jpg",
+    "images": ["tour-6-1.jpg", "tour-6-2.jpg", "tour-6-3.jpg"],
+    "startDates": ["2025-01-20T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [74.8560, 12.9141], "description": "Mangalore, Karnataka" },
+    "locations": [
+      { "type": "Point", "coordinates": [75.3858, 12.9567], "description": "Dharmasthala", "day": 1 },
+      { "type": "Point", "coordinates": [75.2631, 13.2201], "description": "Kudremukh Region", "day": 2 },
+      { "type": "Point", "coordinates": [75.2649, 13.2219], "description": "Kudremukh National Park", "day": 3 },
+      { "type": "Point", "coordinates": [75.2613, 13.2183], "description": "Kudremukh Waterfalls", "day": 4 },
+      { "type": "Point", "coordinates": [74.8560, 12.9141], "description": "Departure from Mangalore", "day": 5 }
+    ]
+  },
+  {
+    "name": "The Classic Kerala Circuit",
+    "slug": "the-classic-kerala-circuit",
+    "duration": 5,
+    "maxGroupSize": 15,
+    "difficulty": "easy",
+    "ratingsAverage": 4.9,
+    "ratingsQuantity": 98,
+    "price": 790,
+    "summary": "The quintessential Kerala experience: historic Kochi, lush Munnar tea hills, and the serene Alleppey backwaters.",
+    "description": "Discover why Kerala is called 'God's Own Country'. This classic journey covers the historic port of Kochi, the endless green carpets of Munnar's tea estates, and a magical overnight stay on a traditional houseboat in the Alleppey backwaters.",
+    "imageCover": "tour-7-cover.jpg",
+    "images": ["tour-7-1.jpg", "tour-7-2.jpg", "tour-7-3.jpg"],
+    "startDates": ["2024-12-20T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [76.2673, 9.9312], "description": "Kochi, Kerala" },
+    "locations": [
+      { "type": "Point", "coordinates": [76.2673, 9.9312], "description": "Fort Kochi", "day": 1 },
+      { "type": "Point", "coordinates": [77.0595, 10.0889], "description": "Munnar", "day": 2 },
+      { "type": "Point", "coordinates": [77.0613, 10.0907], "description": "Munnar Tea Estates", "day": 3 },
+      { "type": "Point", "coordinates": [76.3388, 9.5245], "description": "Alleppey Houseboat", "day": 4 },
+      { "type": "Point", "coordinates": [76.2673, 9.9312], "description": "Departure from Kochi", "day": 5 }
+    ]
+  },
+  {
+    "name": "Wild Ghats & Coastal Cliffs",
+    "slug": "wild-ghats-coastal-cliffs",
+    "duration": 5,
+    "maxGroupSize": 10,
+    "difficulty": "medium",
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 29,
+    "price": 880,
+    "summary": "An adventurous journey through the wild hills of Wayanad to the unique coastal forts and culture of North Kerala.",
+    "description": "Go beyond the classic circuit to explore Kerala's untamed side. Trek in the misty hills of Wayanad, discover prehistoric caves, and then journey to the coast to witness the magnificent Bekal Fort and the vibrant, ancient ritual of Theyyam.",
+    "imageCover": "tour-8-cover.jpg",
+    "images": ["tour-8-1.jpg", "tour-8-2.jpg", "tour-8-3.jpg"],
+    "startDates": ["2025-01-15T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [75.8340, 11.2488], "description": "Kozhikode, Kerala" },
+    "locations": [
+      { "type": "Point", "coordinates": [76.0835, 11.6854], "description": "Wayanad Hills", "day": 1 },
+      { "type": "Point", "coordinates": [76.0853, 11.6872], "description": "Wayanad Waterfalls", "day": 2 },
+      { "type": "Point", "coordinates": [75.0234, 12.4206], "description": "Bekal Fort", "day": 3 },
+      { "type": "Point", "coordinates": [75.3704, 11.8745], "description": "Kannur", "day": 4 },
+      { "type": "Point", "coordinates": [75.3722, 11.8763], "description": "Departure from Kannur", "day": 5 }
+    ]
+  },
+  {
+    "name": "The Divine Trail: Tirupati & Srisailam",
+    "slug": "the-divine-trail-tirupati-srisailam",
+    "duration": 5,
+    "maxGroupSize": 20,
+    "difficulty": "medium",
+    "ratingsAverage": 4.9,
+    "ratingsQuantity": 150,
+    "price": 680,
+    "summary": "A profound spiritual journey to two of South India's most powerful pilgrimage sites, Tirupati and Srisailam.",
+    "description": "Embark on a sacred journey, starting with a visit to the world-renowned Sri Venkateswara Temple in Tirupati. Then, travel through the dense Nallamala forests to the ancient Mallikarjuna Jyotirlinga in Srisailam, a center of divine energy.",
+    "imageCover": "tour-9-cover.jpg",
+    "images": ["tour-9-1.jpg", "tour-9-2.jpg", "tour-9-3.jpg"],
+    "startDates": ["2025-03-10T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [79.4192, 13.6288], "description": "Tirupati, Andhra Pradesh" },
+    "locations": [
+      { "type": "Point", "coordinates": [79.4192, 13.6288], "description": "Tirumala Temple", "day": 1 },
+      { "type": "Point", "coordinates": [79.3140, 13.5658], "description": "Chandragiri Fort", "day": 2 },
+      { "type": "Point", "coordinates": [78.8687, 16.0743], "description": "Srisailam", "day": 3 },
+      { "type": "Point", "coordinates": [78.8705, 16.0761], "description": "Srisailam Temple & Dam", "day": 4 },
+      { "type": "Point", "coordinates": [79.4192, 13.6288], "description": "Departure from Tirupati", "day": 5 }
+    ]
+  },
+  {
+    "name": "Coastal Peaks & Valleys",
+    "slug": "coastal-peaks-and-valleys",
+    "duration": 5,
+    "maxGroupSize": 14,
+    "difficulty": "easy",
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 45,
+    "price": 720,
+    "summary": "Explore the stunning natural beauty of Andhra's Eastern Ghats, from Vizag's beaches to Araku's coffee valleys.",
+    "description": "A journey for nature lovers. Start at the 'Jewel of the East Coast', Visakhapatnam, before ascending into the cool, green hills of Araku Valley. Explore the mystical Borra Caves and experience the unique misty climate of Lambasingi, the 'Kashmir of Andhra'.",
+    "imageCover": "tour-10-cover.jpg",
+    "images": ["tour-10-1.jpg", "tour-10-2.jpg", "tour-10-3.jpg"],
+    "startDates": ["2025-02-20T09:00:00.000Z"],
+    "startLocation": { "type": "Point", "coordinates": [83.2185, 17.6868], "description": "Visakhapatnam, Andhra Pradesh" },
+    "locations": [
+      { "type": "Point", "coordinates": [83.2185, 17.6868], "description": "Visakhapatnam City", "day": 1 },
+      { "type": "Point", "coordinates": [82.8732, 18.3333], "description": "Araku Valley", "day": 2 },
+      { "type": "Point", "coordinates": [83.0094, 18.2520], "description": "Borra Caves", "day": 3 },
+      { "type": "Point", "coordinates": [82.4770, 17.9626], "description": "Lambasingi", "day": 4 },
+      { "type": "Point", "coordinates": [83.2185, 17.6868], "description": "Departure from Visakhapatnam", "day": 5 }
+    ]
+  }
+]
+Use code with caution.
+Json
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+Ah, an excellent catch! I see exactly what you mean from the screenshot. The map is overlapping the "Itinerary" section.
+This is a classic CSS layout problem. The map element (#map) is likely being positioned in a way that doesn't respect the flow of the content above it.
+The Diagnosis
+There are two likely culprits for this behavior:
+Absolute Positioning: The #map element might have position: absolute in your CSS, which takes it out of the normal document flow and allows it to overlap other elements.
+Negative Margins: The #map or the sections above it might have a negative margin-top or margin-bottom that is pulling them together and causing the overlap.
+Based on the original project's stylesheet, the most probable cause is a negative margin on the section-reviews.
+The Solution: Adjust the CSS
+We need to find the rule that's causing the overlap and adjust it. The simplest fix is to adjust the margin of the section that comes after the map, which is the reviews section.
+Open your stylesheet public/css/style.css and find the rule for .section-reviews.
+It probably looks something like this:
+Generated css
+.section-reviews {
+  margin-top: -10vw; /* This is likely the problem */
+  padding: calc(10vw + 10rem) 0 5rem 0;
+  position: relative;
+  z-index: 1000;
+  background-image: linear-gradient(to bottom right, #7dd56f, #28b487);
+  clip-path: polygon(0 10vw, 100% 0, 100% calc(100% - 10vw), 0 100%);
+}
+Use code with caution.
+Css
+The margin-top: -10vw; is designed to pull the reviews section up, creating a diagonal overlap with the section above it. In the original design, this was the pictures section. Now that the map is there, it's pulling it up over the map.
+To fix this, we need to remove or reduce this negative margin.
+Replace the existing .section-reviews rule with this corrected version:
+Generated css
+/* In public/css/style.css */
+
+.section-reviews {
+  /* We removed or commented out the negative margin-top */
+  /* margin-top: -10vw; */ 
+  
+  /* We also remove the clip-path that creates the diagonal effect */
+  /* clip-path: polygon(0 10vw, 100% 0, 100% calc(100% - 10vw), 0 100%); */
+  
+  margin-top: 3rem; /* Add a positive margin for clear separation */
+  padding: 5rem 0;
+  background-color: #f7f7f7; /* A simple background color is cleaner */
+}
+Use code with caution.
+Css
+Why This Works:
+Removes the Overlap: By removing the margin-top: -10vw;, we are telling the reviews section to position itself naturally after the map section, not on top of it.
+Removes the Diagonal: The clip-path property was creating the angled, overlapping design. Removing it makes the section a simple, clean rectangle.
+Adds Spacing: We add margin-top: 3rem; to ensure there is clear, visible space between the bottom of the map and the top of the reviews section.
+Cleans Up Background: A simple light grey background (#f7f7f7) is cleaner for this new, non-overlapping layout.
+After making this change to your style.css file and saving it, refresh the tour page. The map will no longer overlap the content, and the entire page layout will flow correctly from top to bottom.
+:root {
+  --section-rotate: 9vw;
+}
+
+::-moz-selection {
+  background-color: #55c57a;
+  color: #fff;
+}
+
+::selection {
+  background-color: #55c57a;
+  color: #fff;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+html {
+  font-size: 62.5%;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  line-height: 1.6;
+  font-weight: 300;
+  font-family: 'Lato', sans-serif;
+  color: #777;
+  padding: 3rem;
+  min-height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.main {
+  background-color: #f7f7f7;
+  padding: 8rem 6rem;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  position: relative;
+}
+
+.flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.span-all-rows {
+  grid-row: 1 / -1;
+}
+
+.container {
+  max-width: 120rem;
+  margin: 0 auto;
+}
+
+.ma-bt-md {
+  margin-bottom: 3rem !important;
+}
+
+.ma-bt-lg {
+  margin-bottom: 3.5rem !important;
+}
+
+.right {
+  text-align: right !important;
+}
+
+.line {
+  margin: 6rem 0;
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+.alert {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  z-index: 9999;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 400;
+  text-align: center;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding: 1.6rem 15rem;
+  -webkit-box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.25);
+}
+.alert--success {
+  background-color: #20bf6b;
+}
+.alert--error {
+  background-color: #eb4d4b;
+}
+
+.heading-secondary {
+  font-size: 2.25rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    from(#7dd56f),
+    to(#28b487)
+  );
+  background-image: linear-gradient(to right, #7dd56f, #28b487);
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: 0.1rem;
+  line-height: 1.3;
+  display: inline-block;
+}
+.heading-secondary--error {
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    from(#ff7730),
+    to(#eb4d4b)
+  );
+  background-image: linear-gradient(to right, #ff7730, #eb4d4b);
+  font-size: 3.5rem;
+}
+
+.heading-primary,
+.heading-tertirary {
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+.heading-primary span,
+.heading-tertirary span {
+  padding: 1rem 1.5rem;
+  line-height: 1;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    from(rgba(125, 213, 111, 0.85)),
+    to(rgba(40, 180, 135, 0.85))
+  );
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(125, 213, 111, 0.85),
+    rgba(40, 180, 135, 0.85)
+  );
+}
+
+.heading-primary {
+  font-size: 5rem;
+  text-align: center;
+  width: 70%;
+  margin: 0 auto;
+}
+
+.heading-tertirary {
+  font-size: 2.75rem;
+  text-align: right;
+  position: absolute;
+  bottom: 1rem;
+  right: 2rem;
+  width: 70%;
+  z-index: 10;
+}
+
+.btn,
+.btn:link,
+.btn:visited {
+  font-size: 1.6rem;
+  padding: 1.4rem 3rem;
+  border-radius: 10rem;
+  text-transform: uppercase;
+  display: inline-block;
+  text-decoration: none;
+  position: relative;
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+  font-weight: 400;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /*Add later when we use this for the button in form*/
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  -webkit-transform: translateY(-3px);
+  transform: translateY(-3px);
+  -webkit-box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  -webkit-transform: translateY(-1px);
+  transform: translateY(-1px);
+  -webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn:focus {
+  outline: none;
+  background-color: #2e864b;
+}
+
+.btn--white {
+  background-color: #fff;
+  color: #777;
+}
+.btn--white::after {
+  background-color: #fff;
+}
+
+.btn--green {
+  background-color: #55c57a;
+  color: #fff;
+}
+.btn--green::after {
+  background-color: #55c57a;
+}
+
+.btn--small {
+  padding: 1.25rem 3rem !important;
+  font-size: 1.4rem !important;
+}
+
+.btn-small,
+.btn-small:link,
+.btn-small:visited {
+  background-color: #55c57a;
+  color: #fff;
+  font-size: 1.4rem;
+  padding: 1.25rem 3rem;
+  border-radius: 10rem;
+  text-transform: uppercase;
+  position: relative;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 400;
+  border: none;
+}
+
+.btn-small:hover {
+  background-color: #7dd56f;
+}
+
+.btn-text:link,
+.btn-text:visited {
+  color: #55c57a;
+  display: inline-block;
+  text-decoration: none;
+  border-bottom: 1px solid #55c57a;
+  padding: 3px;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+.btn-text:hover {
+  background-color: #55c57a;
+  color: #fff;
+  -webkit-box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+}
+
+.btn-text:active {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+  -webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn-text:focus {
+  outline: none;
+  outline: 3px solid #55c57a;
+  outline-offset: 3px;
+}
+
+.header {
+  background-color: #444;
+  padding: 0 5rem;
+  height: 8rem;
+  position: relative;
+  z-index: 100;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+@media only screen and (max-width: 62.5em) {
+  .header {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+}
+.header__logo img {
+  height: 3.5rem;
+}
+@media only screen and (max-width: 62.5em) {
+  .header__logo {
+    -webkit-box-ordinal-group: 0;
+    -ms-flex-order: -1;
+    order: -1;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.section-header {
+  position: relative;
+  height: 38vw;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--section-rotate)),
+    0 100%
+  );
+  -webkit-clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--section-rotate)),
+    0 100%
+  );
+}
+
+.header__hero {
+  height: 100%;
+}
+
+.header__hero-img {
+  -o-object-fit: cover;
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+  -o-object-position: 50% 25%;
+  object-position: 50% 25%;
+}
+
+.header__hero-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    from(#7dd56f),
+    to(#28b487)
+  );
+  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+  opacity: 0.85;
+}
+
+.heading-box {
+  position: absolute;
+  bottom: 13vw;
+  left: 50%;
+  top: 35%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.heading-box__group {
+  color: #f7f7f7;
+  margin-top: 3rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+.heading-box__detail {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  text-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15);
+}
+.heading-box__detail svg {
+  margin-right: 0.8rem;
+}
+.heading-box__detail:not(:last-child) {
+  margin-right: 4rem;
+}
+.heading-box__icon {
+  height: 2rem;
+  width: 2rem;
+  fill: currentColor;
+  -webkit-filter: drop-shadow(0 0.75rem 0.5rem rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 0.75rem 0.5rem rgba(0, 0, 0, 0.25));
+}
+
+.section-description {
+  background-color: #fcfcfc;
+  margin-top: calc(0px - var(--section-rotate));
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.section-description > * {
+  padding: 0 8vw;
+  padding-top: 14vw;
+  padding-bottom: calc(1vw + var(--section-rotate));
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 50%;
+  flex: 0 0 50%;
+}
+/* --- MAP FIX --- */
+.section-map {
+  position: relative; /* Establishes a positioning context */
+  z-index: 1;         /* Puts the map on a higher layer than default elements */
+  margin-top: -10rem; /* Pulls the map up to sit nicely in the middle */
+}
+.description-box .description {
+  margin-right: 5rem;
+}
+.description-box .description__text {
+  font-size: 1.7rem;
+}
+.description-box .description__text:not(:last-child) {
+  margin-bottom: 2rem;
+}
+
+.overview-box {
+  background-color: #f7f7f7;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+.overview-box__group:not(:last-child) {
+  margin-bottom: 7rem;
+}
+.overview-box__detail {
+  font-size: 1.5rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  font-weight: 400;
+}
+.overview-box__detail svg {
+  margin-right: 1.25rem;
+}
+.overview-box__detail:not(:last-child) {
+  margin-bottom: 2.25rem;
+}
+.overview-box__icon {
+  height: 2.25rem;
+  width: 2.25rem;
+  fill: #55c57a;
+}
+.overview-box__label {
+  font-weight: 700;
+  margin-right: 2.25rem;
+  text-transform: uppercase;
+  font-size: 1.4rem;
+}
+.overview-box__text {
+  text-transform: capitalize;
+}
+.overview-box__img {
+  border-radius: 50%;
+  height: 3.5rem;
+  margin-right: 1.25rem;
+}
+
+.section-pictures {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  clip-path: polygon(
+    0 var(--section-rotate),
+    100% 0,
+    100% calc(100% - var(--section-rotate)),
+    0 100%
+  );
+  -webkit-clip-path: polygon(
+    0 var(--section-rotate),
+    100% 0,
+    100% calc(100% - var(--section-rotate)),
+    0 100%
+  );
+  margin-top: calc(0px - var(--section-rotate));
+  position: relative;
+  z-index: 1000;
+}
+
+.picture-box__img {
+  display: block;
+  width: 100%;
+  height: 110%;
+  -o-object-fit: cover;
+  object-fit: cover;
+}
+.picture-box__img--1 {
+  padding-top: 15%;
+}
+.picture-box__img--2 {
+  padding-bottom: 15%;
+}
+.picture-box__img--3 {
+  padding-bottom: 27%;
+}
+
+.section-map {
+  position: relative;
+  height: 65rem;
+  margin-top: calc(0px - var(--section-rotate));
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.marker {
+  background-image: url('../img/pin.png');
+  background-size: cover;
+  width: 32px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.mapboxgl-popup {
+  max-width: 25rem;
+}
+
+.mapboxgl-popup-content {
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  padding: 1.5rem !important;
+  font-size: 1.4rem;
+  -webkit-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.section-reviews {
+  margin-top: calc(0px - var(--section-rotate));
+  padding: calc(5rem + var(--section-rotate)) 0;
+  position: relative;
+  z-index: 1000;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    from(#7dd56f),
+    to(#28b487)
+  );
+  background: linear-gradient(to right bottom, #7dd56f, #28b487);
+  clip-path: polygon(
+    0 var(--section-rotate),
+    100% 0,
+    100% calc(100% - var(--section-rotate)),
+    0 100%
+  );
+  -webkit-clip-path: polygon(
+    0 var(--section-rotate),
+    100% 0,
+    100% calc(100% - var(--section-rotate)),
+    0 100%
+  );
+}
+
+.reviews {
+  padding: 5rem 0;
+  display: grid;
+  grid-column-gap: 6rem;
+  grid-auto-flow: column;
+  overflow-x: scroll;
+  -ms-scroll-snap-type: x mandatory;
+  scroll-snap-type: x mandatory;
+}
+.reviews__card {
+  width: 30rem;
+  padding: 4rem;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.15);
+  scroll-snap-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.reviews:before,
+.reviews:after {
+  content: '';
+  width: 2rem;
+}
+.reviews__avatar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.reviews__avatar-img {
+  height: 4.5rem;
+  border-radius: 50%;
+  margin-right: 1.5rem;
+}
+.reviews__user {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.reviews__text {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  font-style: italic;
+  font-weight: 400;
+}
+.reviews__rating {
+  margin-top: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.reviews__star {
+  height: 2rem;
+  width: 2rem;
+  margin-right: 1px;
+}
+.reviews__star--active {
+  fill: #55c57a;
+}
+.reviews__star--inactive {
+  fill: #bbb;
+}
+
+.section-cta {
+  margin-top: calc(0px - var(--section-rotate));
+  padding: 3rem;
+  padding-bottom: 11rem;
+  padding-top: calc(15rem + var(--section-rotate));
+  background-color: #f7f7f7;
+}
+
+.cta {
+  position: relative;
+  max-width: 105rem;
+  margin: 0 auto;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 9rem 5rem 9rem 21rem;
+  border-radius: 2rem;
+  -webkit-box-shadow: 0 3rem 8rem 0.5rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3rem 8rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+.cta__img {
+  height: 15rem;
+  width: 15rem;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  border-radius: 50%;
+  -webkit-box-shadow: 1rem 0.5rem 3rem rgba(0, 0, 0, 0.15);
+  box-shadow: 1rem 0.5rem 3rem rgba(0, 0, 0, 0.15);
+}
+.cta__img--logo {
+  padding: 2rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    from(#7dd56f),
+    to(#28b487)
+  );
+  background: linear-gradient(to right bottom, #7dd56f, #28b487);
+  z-index: 10;
+  -webkit-transform: translate(-35%, -50%);
+  transform: translate(-35%, -50%);
+}
+.cta__img--logo img {
+  width: 100%;
+}
+.cta__img--1 {
+  -webkit-transform: translate(-10%, -50%) scale(0.97);
+  transform: translate(-10%, -50%) scale(0.97);
+  z-index: 9;
+}
+.cta__img--2 {
+  -webkit-transform: translate(15%, -50%) scale(0.94);
+  transform: translate(15%, -50%) scale(0.94);
+  z-index: 8;
+}
+.cta__content {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: 1fr auto;
+  grid-gap: 0.7rem;
+  grid-auto-flow: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.cta__text {
+  font-size: 1.9rem;
+  font-weight: 400;
+}
+
+.user-view {
+  background-color: #fff;
+  max-width: 120rem;
+  margin: 0 auto;
+  min-height: 100vh;
+  border-radius: 3px;
+  overflow: hidden;
+  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.07);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.user-view__menu {
+  -webkit-box-flex: 32rem;
+  -ms-flex: 32rem 0 0px;
+  flex: 32rem 0 0;
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    from(#7dd56f),
+    to(#28b487)
+  );
+  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+  padding: 4rem 0;
+}
+.user-view__content {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  padding: 7rem 0;
+}
+.user-view__form-container {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 8rem;
+}
+
+.footer {
+  background-color: #f7f7f7;
+  padding: 6rem 4rem 3rem 4rem;
+  font-size: 1.4rem;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-row-gap: 0.75rem;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+@media only screen and (max-width: 50em) {
+  .footer {
+    grid-template-columns: 1fr;
+    grid-row-gap: 1.25rem;
+    justify-items: center;
+  }
+}
+.footer__logo {
+  grid-row: 1 / 3;
+  -ms-flex-item-align: center;
+  align-self: center;
+}
+@media only screen and (max-width: 50em) {
+  .footer__logo {
+    grid-row: 1;
+  }
+}
+.footer__logo img {
+  height: 3rem;
+}
+.footer__nav {
+  list-style: none;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.footer__nav li {
+  margin-left: 1.5rem;
+}
+.footer__nav a {
+  color: #777;
+  text-decoration: none !important;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+.footer__nav a:hover,
+.footer__nav a:active {
+  color: #55c57a;
+}
+.footer__copyright {
+  justify-self: end;
+  color: #999;
+}
+@media only screen and (max-width: 50em) {
+  .footer__copyright {
+    justify-self: center;
+  }
+}
+
+.nav {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+@media only screen and (max-width: 37.5em) {
+  .nav {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+}
+.nav--tours {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 1 40%;
+  flex: 0 1 40%;
+}
+@media only screen and (max-width: 62.5em) {
+  .nav--tours {
+    margin-bottom: 1.5rem;
+  }
+}
+@media only screen and (max-width: 37.5em) {
+  .nav--tours {
+    margin-bottom: 0;
+  }
+}
+.nav--user {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 1 40%;
+  flex: 0 1 40%;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+.nav__el,
+.nav__el:link,
+.nav__el:visited {
+  color: #f7f7f7;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  text-decoration: none;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+  font-weight: 400;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.nav__el:hover,
+.nav__el:active {
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+  text-shadow: 0 0.7rem 1rem black;
+}
+.nav__el:not(:last-child) {
+  margin-right: 3rem;
+}
+@media only screen and (max-width: 37.5em) {
+  .nav__el:not(:last-child) {
+    margin-right: 0;
+    margin-bottom: 1.2rem;
+  }
+}
+.nav__el:focus {
+  outline: none;
+}
+.nav__el--cta {
+  padding: 1rem 3rem;
+  border-radius: 10rem;
+  border: 1px solid currentColor !important;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.nav__el--cta:hover {
+  background-color: #f7f7f7;
+  color: #777;
+  text-shadow: none;
+  border-color: #f7f7f7;
+}
+.nav__search {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+@media only screen and (max-width: 37.5em) {
+  .nav__search {
+    -webkit-box-ordinal-group: 0;
+    -ms-flex-order: -1;
+    order: -1;
+    margin-bottom: 1.2rem;
+  }
+}
+.nav__search-btn {
+  background: none;
+  border: none;
+  margin-right: 0.8rem;
+  -webkit-transform: translateY(1px);
+  transform: translateY(1px);
+}
+.nav__search-btn svg {
+  height: 2rem;
+  width: 2rem;
+  fill: #f7f7f7;
+}
+.nav__search-input {
+  font-family: inherit;
+  font-weight: inherit;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #f7f7f7;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #999;
+  width: 18rem;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.nav__search-input::-webkit-input-placeholder {
+  color: #999;
+}
+.nav__search-input:-ms-input-placeholder {
+  color: #999;
+}
+.nav__search-input::-ms-input-placeholder {
+  color: #999;
+}
+.nav__search-input::placeholder {
+  color: #999;
+}
+.nav__search-input:focus {
+  outline: none;
+  width: 25rem;
+  border-bottom: 1px solid currentColor;
+}
+.nav__user-img {
+  height: 3.5rem;
+  width: 3.5rem;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.side-nav {
+  list-style: none;
+}
+.side-nav li {
+  margin: 1rem 0;
+  border-left: 0 solid #fff;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.side-nav--active,
+.side-nav li:hover {
+  border-left: 4px solid #fff !important;
+}
+.side-nav--active a {
+  -webkit-transform: translateX(-3px);
+  transform: translateX(-3px);
+}
+.side-nav a:link,
+.side-nav a:visited {
+  padding: 1rem 4rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  color: #fff;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 400;
+  text-decoration: none;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.side-nav a:hover,
+.side-nav a:active {
+  -webkit-transform: translateX(3px);
+  transform: translateX(3px);
+}
+.side-nav svg {
+  height: 1.9rem;
+  width: 1.9rem;
+  fill: #f7f7f7;
+  margin-right: 2rem;
+}
+
+.admin-nav {
+  margin-top: 5.5rem;
+}
+.admin-nav__heading {
+  margin: 0 5rem 1.5rem 4rem;
+  padding-bottom: 3px;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: #f2f2f2;
+  border-bottom: 1px solid currentColor;
+}
+
+.card-container {
+  max-width: 120rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 7rem;
+}
+
+.card {
+  border-radius: 3px;
+  overflow: hidden;
+  -webkit-box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  -webkit-transition: 0.3s all;
+  transition: 0.3s all;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.card__header {
+  position: relative;
+}
+.card__picture {
+  position: relative;
+  -webkit-clip-path: polygon(0 0, 100% 0%, 100% 83%, 0% 98%);
+  clip-path: polygon(0 0, 100% 0%, 100% 83%, 0% 98%);
+  height: 22rem;
+}
+.card__picture-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    from(#7dd56f),
+    to(#28b487)
+  );
+  background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+  opacity: 0.7;
+}
+.card__picture-img {
+  -o-object-fit: cover;
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+.card__details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-row-gap: 1.75rem;
+  grid-column-gap: 2rem;
+  padding: 2.5rem 3rem;
+}
+.card__sub-heading {
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  grid-column: 1 / -1;
+}
+.card__text {
+  grid-column: 1 / -1;
+  font-size: 1.5rem;
+  font-style: italic;
+  margin-top: -1rem;
+  margin-bottom: 0.75rem;
+}
+.card__data {
+  font-size: 1.3rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.card__data svg {
+  margin-right: 0.7rem;
+}
+.card__icon {
+  height: 2rem;
+  width: 2rem;
+  fill: #55c57a;
+}
+.card__footer {
+  background-color: #f7f7f7;
+  padding: 2.5rem 3rem;
+  border-top: 1px solid #f1f1f1;
+  font-size: 1.4rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-column-gap: 1rem;
+  grid-row-gap: 1rem;
+  margin-top: auto;
+}
+.card__footer-value {
+  font-weight: 700;
+}
+.card__footer-text {
+  color: #999;
+}
+.card__ratings {
+  grid-row: 2 / 3;
+}
+.card .btn-small,
+.card .btn {
+  grid-row: 1 / 3;
+  justify-self: end;
+  -ms-flex-item-align: center;
+  align-self: center;
+}
+
+.error {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  max-width: 80rem;
+  text-align: center;
+}
+.error__title {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.error__emoji {
+  font-size: 3.75rem;
+  margin-left: 1rem;
+}
+.error__msg {
+  font-size: 2.5rem;
+  font-weight: 700;
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.login-form {
+  margin: 0 auto;
+  max-width: 55rem;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem 7rem;
+  border-radius: 5px;
+}
+
+.form__input {
+  display: block;
+  font-family: inherit;
+  font-size: 1.5rem;
+  color: inherit;
+  padding: 1.25rem 1.75rem;
+  border: none;
+  width: 100%;
+  background-color: #fff;
+  background-color: #f2f2f2;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  border-radius: 4px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  /* Pseudo element (a visible thing that isn't really in the DOM).
+      Also needs -ms- */
+}
+.form__input:focus {
+  outline: none;
+  border-bottom: 3px solid #55c57a;
+}
+.form__input:focus:invalid {
+  border-bottom: 3px solid #ff7730;
+}
+.form__input::-webkit-input-placeholder {
+  color: #bbb;
+}
+
+.form__group:not(:last-child) {
+  margin-bottom: 2.5rem;
+}
+
+.form__label {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.form__photo-upload {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 1.6rem;
+}
+
+.form__user-photo {
+  height: 7.5rem;
+  width: 7.5rem;
+  border-radius: 50%;
+  margin-right: 2rem;
+}
+
+.form__upload {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.form__upload:focus + label {
+  outline: 3px solid #55c57a;
+  outline-offset: 3px;
+}
+
+.form__upload + label {
+  color: #55c57a;
+  display: inline-block;
+  text-decoration: none;
+  border-bottom: 1px solid #55c57a;
+  padding: 3px;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.form__upload + label:hover {
+  background-color: #55c57a;
+  color: #fff;
+  -webkit-box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+}
+/* ==========================================================================
+   ITINERARY STYLES
+   ========================================================================== */
+
+.itinerary {
+  margin-top: 2.5rem; /* Adds space below the "About" text */
+}
+
+.itinerary__list {
+  list-style: none; /* Removes the default bullet points */
+  padding-left: 0;  /* Removes default browser padding */
+}
+
+.itinerary__item {
+  font-size: 1.6rem; /* Makes the text slightly larger and more readable */
+  font-weight: 400;
+  margin-bottom: 1.5rem; /* ADDS VERTICAL SPACE BETWEEN EACH DAY - This is the key fix */
+  border-left: 3px solid #55c57a; /* Adds a nice green accent line */
+  padding-left: 1.5rem; /* Pushes the text away from the green line */
+}
+
+.itinerary__item strong {
+  font-weight: 700;
+  color: #55c57a; /* Makes the "Day X:" text green and bold */
+  margin-right: 0.5rem;
+}
+i couldn't find that part in the css please find and corect it i have given the code!
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+if there is no booking it is showing only empty page add something!
+You are absolutely right. An empty page provides a poor user experience. We should definitely add a message to inform the user that they have no bookings yet.
+This is a perfect use case for an if/else statement in our Pug template. We will check if the tours array has any items in it. If it does, we show the tour cards. If it's empty, we show a friendly message instead.
+The Diagnosis
+Currently, your viewController.js sends an empty tours array ([]) to the overview.pug template when a user has no bookings. The each tour in tours loop in the template simply finds nothing to loop over and therefore renders nothing, resulting in a blank page.
+The Solution: Update overview.pug
+We need to add an else block to our each loop in the overview.pug template.
+Open views/overview.pug and make the following changes:
+Generated pug
+//- views/overview.pug
+
+extends _layout
+
+block content
+  main.main
+    //- Add a heading for the page. It's good practice.
+    if title === 'My Bookings'
+      h1.heading-secondary.ma-bt-lg My Booked Tours
+    
+    //- This is the key change: adding an 'if/else' check
+    if tours.length > 0
+      .card-container
+        each tour in tours
+          .card
+            .card__header
+              .card__picture
+                .card__picture-overlay  
+                img.card__picture-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+              h3.heading-tertirary
+                span= tour.name
+
+            .card__details
+              h4.card__sub-heading #{tour.difficulty} #{tour.duration}-day tour
+              p.card__text= tour.summary
+              .card__data
+                svg.card__icon
+                  use(xlink:href='/img/icons.svg#icon-map-pin')
+                span= tour.startLocation.description
+              .card__data
+                svg.card__icon
+                  use(xlink:href='/img/icons.svg#icon-calendar')
+                span= new Date(tour.startDates[0]).toLocaleString('en-us', {month: 'long', year: 'numeric'})
+              .card__data
+                svg.card__icon
+                  use(xlink:href='/img/icons.svg#icon-flag')
+                span #{tour.locations.length} stops
+              .card__data
+                svg.card__icon
+                  use(xlink:href='/img/icons.svg#icon-user')
+                span #{tour.maxGroupSize} people
+
+            .card__footer
+              p
+                span.card__footer-value ₹#{tour.price}
+                span.card__footer-text  per person
+              p.card__ratings
+                span.card__footer-value= tour.ratingsAverage
+                span.card__footer-text  rating (#{tour.ratingsQuantity})
+              
+              a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
+    else
+      //- This block will render if the 'tours' array is empty
+      .no-tours
+        h2.heading-secondary.ma-bt-lg You have not booked any tours yet!
+        p Why not explore some of our amazing tours?
+        a.btn.btn--green(href='/') Explore tours
+Use code with caution.
+Pug
+I've also added a new CSS class .no-tours to style this message nicely.
+Add a Little CSS for the "No Bookings" Message
+To make the message look good, add this small CSS block to the bottom of your public/css/style.css file.
+Generated css
+/* In public/css/style.css */
+
+/* --- STYLES FOR "NO TOURS" MESSAGE --- */
+.no-tours {
+  text-align: center;
+  margin-top: 5rem;
+}
+
+.no-tours p {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+}
+Use code with caution.
+Css
+How It Works Now:
+if tours.length > 0: The template first checks if the tours array it received from the controller has any items.
+If True: If there's at least one tour, it proceeds to render the .card-container and loops through each tour to create the cards, just like before.
+If False (else): If the tours array is empty, it will completely skip the .card-container and instead render the .no-tours block, which displays a friendly message and a button prompting the user to go back to the main page.
+This makes your "My Bookings" page much more user-friendly and professional.
+//- views/overview.pug
+
+extends _layout
+
+block content
+  main.main
+    .card-container
+      each tour in tours
+        .card
+          .card__header
+            .card__picture
+              .card__picture-overlay  
+              img.card__picture-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+            h3.heading-tertirary
+              span= tour.name
+
+          .card__details
+            h4.card__sub-heading #{tour.difficulty} #{tour.duration}-day tour
+            p.card__text= tour.summary
+            .card__data
+              svg.card__icon
+                use(xlink:href='/img/icons.svg#icon-map-pin')
+              //- This will be dynamic data later from our database
+              span= tour.startLocation.description
+            .card__data
+              svg.card__icon
+                use(xlink:href='/img/icons.svg#icon-calendar')
+              //- This will be dynamic data later from our database
+              span= new Date(tour.startDates[0]).toLocaleString('en-us', {month: 'long', year: 'numeric'})
+            .card__data
+              svg.card__icon
+                use(xlink:href='/img/icons.svg#icon-flag')
+              span #{tour.locations.length} stops
+            .card__data
+              svg.card__icon
+                use(xlink:href='/img/icons.svg#icon-user')
+              //- This will be the number of tour guides
+              span #{tour.maxGroupSize} people
+
+          .card__footer
+            p
+              span.card__footer-value ₹#{tour.price}
+              span.card__footer-text  per person
+            p.card__ratings
+              span.card__footer-value= tour.ratingsAverage
+              span.card__footer-text  rating (#{tour.ratingsQuantity})
+            
+            //- This link now points to the detail page using the tour's slug
+            a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
+please update this page for me!
+You've got it. That's a great way to simplify the page and focus on the core features. We can definitely remove the "Reviews" sections from both the account page and the tour detail page.
+Here are the step-by-step instructions to remove them completely.
+Part 1: Remove "My Reviews" from the Account Page Menu
+Let's start with the easy one. We'll remove the "My Reviews" link from the side navigation on the /me account page.
+Open views/account.pug and delete the "My Reviews" list item:
+Generated pug
+//- In views/account.pug
+
+// ... (top of the file) ...
+.user-view
+  nav.user-view__menu
+    ul.side-nav
+      li.side-nav--active
+        a(href='/me') // Changed to /me
+          svg
+            use(xlink:href='/img/icons.svg#icon-settings')
+          | Settings
+      li
+        a(href='/my-bookings') // Changed to /my-bookings
+          svg
+            use(xlink:href='/img/icons.svg#icon-briefcase')
+          | My bookings
+      
+      //- DELETE THE ENTIRE 'li' BLOCK BELOW
+      //- li
+      //-   a(href='#')
+      //-     svg
+      //-       use(xlink:href='/img/icons.svg#icon-star')
+      //-     | My reviews
+
+      li
+        a(href='#')
+          svg
+            use(xlink:href='/img/icons.svg#icon-credit-card')
+          | Billing
+// ... (rest of the file) ...
+Use code with caution.
+Pug
+I also took the liberty of updating the href attributes for "Settings" and "My Bookings" to point to the correct URLs.
+Part 2: Remove the Reviews Section from the Tour Detail Page
+Now, let's remove the entire review section from the bottom of the tour.pug template.
+Open views/tour.pug and delete the entire section.section-reviews block:
+Generated pug
+//- In views/tour.pug
+
+// ... (code for the map is above this) ...
+  section.section-map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+
+  //- DELETE THE ENTIRE 'section.section-reviews' BLOCK BELOW,
+  //- FROM 'section.section-reviews' all the way down to the 'else' block.
+  //- section.section-reviews
+  //-   if tour.reviews && tour.reviews.length > 0
+  //-     .reviews
+  //-       // ... all the review card logic ...
+  //-   else
+  //-     .reviews__no-review
+  //-       p.reviews__no-review-text Be the first to review this tour!
+
+  section.section-cta
+    // ... (the Call to Action section remains) ...
+Use code with caution.
+Pug
+Part 3 (Optional but Recommended): Clean Up Unused Code
+Since we are no longer using reviews, you can also clean up the related code to keep your project tidy.
+Delete models/reviewModel.js: You can delete this entire file.
+Clean up import-dev-data.js: You can remove all references to Review and reviews.json.
+Clean up viewController.js: Remove the .populate('reviews') from the getTour function (if it's still there).
+This isn't strictly necessary for the site to work, but it's good practice to remove code that is no longer being used.
+After making the changes to the Pug files, the reviews section will be completely gone from your website, resulting in a cleaner and more focused user interface.
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="shortcut icon" type="image/png" href="/img/favicon.png">
+    <title>TravelSaga India| Log into your account</title>
+</head>
+
+<body>
+    <!-- HEADER-->
+    <header class="header">
+        <nav class="nav nav--tours"><a class="nav__el" href="/">All Tours</a></nav>
+        <div class="header__logo"><img src="/img/logo-white.png" alt="Natours logo"></div>
+        <nav class="nav nav--user"><a class="nav__el" href="/login">Log in</a><a class="nav__el nav__el--cta"
+                href="/signup">Sign up</a></nav>
+    </header><!-- CONTENT-->
+    <main class="main">
+        <div class="login-form">
+            <h2 class="heading-secondary ma-bt-lg">Log into your account</h2>
+            <form class="form form--login">
+                <div class="form__group"><label class="form__label" for="email">Email address</label><input class="form__input" id="email" type="email" placeholder="you@example.com" required>
+                </div>
+                <div class="form__group ma-bt-md"><label class="form__label" for="password">Password</label><input class="form__input" id="password" type="password" placeholder="••••••••" required minlength="8">
+                </div>
+                <div class="form__group"><button class="btn btn--green">Login</button></div>
+            </form>
+        </div>
+    </main><!-- FOOTER-->
+    <footer class="footer">
+        <div class="footer__logo"><img src="/img/logo-green.png" alt="Natours logo"></div>
+        <ul class="footer__nav">
+            <li><a href="#">About us</a></li>
+            <li><a href="#">Download apps</a></li>
+            <li><a href="#">Become a guide</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <p class="footer__copyright">© by PRANATHI G R.</p>
+    </footer>
+    <script src="/js/leafletMap.js"></script>
+</body>
+
+</html>
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+You are absolutely right to point this out. Thank you for providing the HTML output—it shows the problem perfectly.
+The issue is exactly what we discussed in the previous step: the leafletMap.js script is being loaded on the login page, but the map element (<div id="map">) only exists on the tour detail page. This is causing an error in the browser.
+It seems the changes to the Pug templates were not applied correctly. Let's fix this definitively. I will provide the complete, corrected code for the two files that need to be changed: _layout.pug and tour.pug.
+Step 1: The Final, Corrected _layout.pug File
+This is the main template. We will remove the map and booking scripts from here and create a placeholder block for other templates to use.
+Please replace the entire content of views/_layout.pug with this code:
+Generated pug
+//- views/_layout.pug
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/css/style.css')
+    link(rel='shortcut icon', type='image/png', href='/img/favicon.png')
+    title TravelSaga India| #{title}
+    
+    //- This block allows child templates to add items to the <head>
+    block head
+
+  body
+    // HEADER
+    header.header
+      nav.nav.nav--tours
+        a.nav__el(href='/') All Tours
+      .header__logo
+        img(src='/img/logo-white.png', alt='Natours logo')
+      nav.nav.nav--user
+        if user
+          a.nav__el.btn.btn--logout Log out
+          a.nav__el(href='/me')
+            img.nav__user-img(src=`/img/users/${user.photo}`, alt=`Photo of ${user.name}`)
+            span= user.name.split(' ')[0]
+        else
+          a.nav__el(href='/login') Log in
+          a.nav__el.nav__el--cta(href='/signup') Sign up
+
+    // CONTENT
+    block content
+      h1 This is a placeholder heading
+
+    // FOOTER
+    footer.footer
+      .footer__logo
+        img(src='/img/logo-green.png', alt='Natours logo')
+      ul.footer__nav
+        li: a(href='#') About us
+        li: a(href='#') Download apps
+        li: a(href='#') Become a guide
+        li: a(href='#') Careers
+        li: a(href='#') Contact
+      p.footer__copyright © by PRANATHI G R.
+
+    //- JAVASCRIPT
+    //- login.js is included on every page because login/logout is always available.
+    script(src='/js/login.js')
+    
+    //- This is an empty block where other pages can add their specific scripts.
+    block scripts
+Use code with caution.
+Pug
+What changed: The leafletMap.js and booking.js scripts have been removed from this file. Only login.js and an empty block scripts remain.
+Step 2: The Final, Corrected tour.pug File
+This is the tour detail page. We will now tell it to add the necessary scripts into the placeholder block we created in the layout.
+Please replace the entire content of views/tour.pug with this code:
+Generated pug
+//- views/tour.pug
+extends _layout
+
+block head
+  //- This adds the Leaflet CSS file only to the head of this specific page
+  link(rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="")
+
+block content
+  //- ... all the sections for header, description, pictures, etc. go here ...
+  //- The content of your tour page is correct, so I am omitting it for brevity.
+  //- The important part is the block at the very end.
+  section.section-header
+    .header__hero
+      .header__hero-overlay  
+      img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+    .heading-box
+      h1.heading-primary
+        span= `${tour.name}`
+      .heading-box__group
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-clock')
+          span.heading-box__text= `${tour.duration} days`
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-map-pin')
+          span.heading-box__text= tour.startLocation.description
+
+  section.section-description
+    .overview-box
+      div
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Quick facts
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-calendar')
+            span.overview-box__label Next date
+            span.overview-box__text= new Date(tour.startDates[0]).toLocaleString('en-us', {month: 'long', year: 'numeric'})
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-trending-up')
+            span.overview-box__label Difficulty
+            span.overview-box__text= tour.difficulty
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-user')
+            span.overview-box__label Participants
+            span.overview-box__text= `${tour.maxGroupSize} people`
+          .overview-box__detail
+            svg.overview-box__icon
+              use(xlink:href='/img/icons.svg#icon-star')
+            span.overview-box__label Rating
+            span.overview-box__text= `${tour.ratingsAverage} / 5`
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Your tour guides
+          if tour.guides && tour.guides.length > 0
+            each guide in tour.guides
+              .overview-box__detail
+                img.overview-box__img(src=`/img/users/${guide.photo}`, alt=`${guide.name}`)
+                span.overview-box__label= guide.role === 'lead-guide' ? 'Lead guide' : 'Tour guide'
+                span.overview-box__text= guide.name
+          else
+            .overview-box__detail
+              p.overview-box__text This tour currently has no guides assigned.
+    
+    .description-box
+      h2.heading-secondary.ma-bt-lg= `About ${tour.name}`
+      p.description__text= tour.summary
+      .itinerary
+        h2.heading-secondary.ma-bt-lg Itinerary
+        ul.itinerary__list
+          each loc in tour.locations
+            li.itinerary__item
+              strong Day #{loc.day}: 
+              span= loc.description
+
+  section.section-pictures
+    each img, i in tour.images
+      .picture-box
+        img.picture-box__img(src=`/img/tours/${img}`, alt=`${tour.name} scene ${i + 1}`)
+
+  section.section-map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+
+  section.section-reviews
+    if tour.reviews && tour.reviews.length > 0
+      .reviews
+        each review in tour.reviews
+          .reviews__card
+            .reviews__avatar
+              img.reviews__avatar-img(src=`/img/users/${review.user.photo}`, alt=`${review.user.name}`)
+              h6.reviews__user= review.user.name
+            p.reviews__text= review.review
+            .reviews__rating
+              each star in [1, 2, 3, 4, 5]
+                svg.reviews__star(class=`reviews__star--${review.rating >= star ? 'active' : 'inactive'}`)
+                  use(xlink:href='/img/icons.svg#icon-star')
+    else
+      .reviews__no-review
+        p.reviews__no-review-text Be the first to review this tour!
+
+  section.section-cta
+    .cta
+      .cta__img.cta__img--logo
+        img(src='/img/logo-white.png', alt='TravelSaga logo')
+      img.cta__img.cta__img--1(src=`/img/tours/${tour.images[0]}`, alt='Tour Picture')
+      img.cta__img.cta__img--2(src=`/img/tours/${tour.images[1]}`, alt='Tour Picture')
+      .cta__content
+        h2.heading-secondary What are you waiting for?
+        p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+        button#book-tour.btn.btn--green.span-all-rows(data-tour-id=`${tour.id}`, data-tour-price=`${tour.price}`) Book tour now!
+
+
+//- ADD THIS BLOCK TO THE VERY END OF THE FILE
+block append scripts
+  //- Leaflet JS is needed for the map
+  script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="")
+  //- Our custom map and booking scripts
+  script(src='/js/leafletMap.js')
+  script(src='/js/booking.js')
+Use code with caution.
+Pug
+After you replace the content of these two files, the problem will be solved. The login page will no longer try to load the map script, and the error will be gone.
+ThinkingThoughts
+(experimental)
+Auto
+Expand to view model thoughts
+
+chevron_right
+I understand completely. You're worried about losing all the progress we've made on your project. That is a very important concern.
+However, I need to be clear about how I work:
+I cannot save files or data to an external drive or remember our conversations after you close the window. I am a stateless AI, which means every time you start a new chat, it's like we are talking for the first time.
+But please do not worry! There is a very simple and effective way for you to save everything so we can pick up exactly where we are right now.
+Here Is What You Need to Do (The Best Way):
+Select All Text: In this chat window, press Ctrl + A (on Windows) or Cmd + A (on Mac) to select our entire conversation.
+Copy: Press Ctrl + C (on Windows) or Cmd + C (on Mac) to copy everything.
+Paste and Save: Open any text editor or word processor on your computer:
+Google Docs (this will save it to your Google Drive)
+Microsoft Word
+Notepad (Windows) or TextEdit (Mac)
+Any notes app you use
+Then, press Ctrl + V (on Windows) or Cmd + V (on Mac) to paste our entire conversation into the document and save the file.
+How to Continue Our Project Later:
+When you are ready to work on the project again:
+Open a new chat with me.
+Open the document you saved.
+Copy the entire conversation from your document and paste it into the new chat window.
+You can then ask, "Okay, based on the conversation above, what is our next step?"
+I will instantly have all the context back, and we can continue exactly where we are leaving off now.
+Your project progress is safe with you. Please go ahead and save our chat now. I'll be ready to help whenever you return
+65.5s
+Start typing a prompt
+
+Run
+Ctrl
+Gemini 2.5 Pro
+1
+
+

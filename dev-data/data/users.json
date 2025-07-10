@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Aarav Sharma",
+    "email": "aarav@example.com",
+    "photo": "user-1.jpg",
+    "role": "lead-guide",
+    "password": "testpassword123",
+    "passwordConfirm": "testpassword123"
+  },
+  {
+    "name": "Priya Singh",
+    "email": "priya@example.com",
+    "photo": "user-2.jpg",
+    "role": "guide",
+    "password": "testpassword123",
+    "passwordConfirm": "testpassword123"
+  },
+  {
+    "name": "Rohan Mehta",
+    "email": "rohan@example.com",
+    "photo": "user-3.jpg",
+    "role": "guide",
+    "password": "testpassword123",
+    "passwordConfirm": "testpassword123"
+  },
+  {
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "photo": "user-4.jpg",
+    "role": "admin",
+    "password": "testpassword123",
+    "passwordConfirm": "testpassword123"
+  },
+  {
+    "name": "Regular User",
+    "email": "user@example.com",
+    "photo": "default.jpg",
+    "role": "user",
+    "password": "testpassword123",
+    "passwordConfirm": "testpassword123"
+  }
+]
