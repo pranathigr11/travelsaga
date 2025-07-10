@@ -7,6 +7,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet'); // <--- IMPORT HELMET
+
 // Import routers
 const viewRouter = require('./routes/viewRoutes');
 const tourRouter = require('./routes/tourRoutes');
@@ -26,6 +28,23 @@ mongoose.connect(DB).then(() => console.log('DB connection successful!'));
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      connectSrc: ["'self'", 'https://*.tiles.mapbox.com', 'https://api.mapbox.com', 'https://events.mapbox.com'],
+      scriptSrc: ["'self'", 'https://unpkg.com/', 'https://tile.openstreetmap.org'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://unpkg.com/', 'https://tile.openstreetmap.org'],
+      workerSrc: ["'self'", "blob:"],
+      objectSrc: ["'none'"],
+      imgSrc: ["'self'", "blob:", "data:", 'https://unpkg.com/', 'https://*.tile.openstreetmap.org'],
+      fontSrc: ["'self'"],
+    },
+  })
+);
+
 
 // --- 5. MIDDLEWARE ---
 // This should come before the routes that need it.
